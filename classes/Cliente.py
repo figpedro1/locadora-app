@@ -37,7 +37,7 @@ class Cliente:
         Formata um CPF no formato XXX.XXX.XXX-XX, garantindo que ele seja válido
         :param cpf: CPF que se deseja formatar/checar validade
         :type cpf: str | int
-        :return: CPF formatado no formato XXX.XXX.XXX-XX
+        :return: CPF no formato XXX.XXX.XXX-XX
         :rtype: str
         """
         cpf = str(cpf).replace(".", "").replace("-", "")
@@ -87,7 +87,7 @@ class Cliente:
 
     def get_cpf(self) -> str:
         """
-        Retorna o CPF
+        Retorna o CPF do cliente
         :return: CPF
         :rtype: str
         """
@@ -127,26 +127,59 @@ class Cliente:
         """
         Retorna o idade do cliente
         :return: Idade do cliente
-        :rtype
+        :rtype: int
         """
         return self.__idade
 
     def set_endereco(self, novo_endereco: str) -> None:
+        """
+        Define o endereco do cliente
+        :param novo_endereco: Endereço para o qual deve ser definido
+        :return: None
+        :rtype: None
+        """
         self.__endereco = str(novo_endereco)
 
     def get_endereco(self) -> str:
+        """
+        Retorna o endereco do cliente
+        :return: Endereço do cliente
+        :rtype: str
+        """
         return self.__endereco
 
     def set_cidade(self, nova_cidade: str) -> None:
+        """
+        Define a cidade do cliente
+        :param nova_cidade: Cidade para a qual deve ser definida
+        :return: None
+        :rtype: None
+        """
         self.__cidade = str(nova_cidade)
 
     def get_cidade(self) -> str:
+        """
+        Retorna a cidade do cliente
+        :return: Cidade do cliente
+        :rtype: str
+        """
         return self.__cidade
 
     def set_estado(self, novo_estado: str) -> None:
+        """
+        Define o estado do cliente
+        :param novo_estado: Estado para o qual deve ser definido
+        :return: None
+        :rtype: None
+        """
         self.__estado = str(novo_estado)
 
     def get_estado(self) -> str:
+        """
+        Retorna o estado do cliente
+        :return: Estado do cliente
+        :rtype: str
+        """
         return self.__estado
 
     def __init__(
@@ -159,6 +192,24 @@ class Cliente:
         estado: str,
         vazio: bool = False
     ) -> None:
+        """
+        Inicializa um objeto Cliente e todos seus atributos,
+        ou inicializa um objeto Cliente vazio se vazio=True
+        :param cpf: CPF do cliente, formatado ou não
+        :type cpf: str
+        :param nome: Nome do cliente
+        :type nome: str
+        :param idade: Idade do cliente
+        :type idade: int
+        :param endereco: Endereco do cliente
+        :type endereco: str
+        :param cidade: Cidade do cliente
+        :type cidade: str
+        :param estado: Estado do cliente
+        :type estado: str
+        :param vazio: Deve ser definido como True caso deseje iniciar um objeto vazio
+        :type vazio: bool
+        """
         if not vazio:
             self.set_cpf(cpf)
             self.set_nome(nome)
@@ -168,6 +219,12 @@ class Cliente:
             self.set_estado(estado)
 
     def get_linha(self) -> tuple:
+        """
+        Retorna uma tupla com os atributos do cliente.
+        Usado em conjunto com csv.writer.writerow()
+        :return: Tupla com os atributos do cliente
+        :rtype: tuple
+        """
         return (
             self.get_cpf(),
             self.get_nome(),
@@ -178,6 +235,11 @@ class Cliente:
         )
 
     def is_valido(self) -> bool:
+        """
+        Verifica se o objeto Cliente é válido (Tem todos os atributos) e pode ser salvo
+        :return: True se o objeto Cliente for válido, False se o objeto Cliente for inválido
+        :rtype: bool
+        """
         if (
             self.get_cpf() is None or
             self.get_nome() is None or
