@@ -89,46 +89,5 @@ class Carros:
                 escritor.writerow(item.get_linha())
             self.__salvo = True
 
-    def modificar_carro(
-            self,
-            veiculo_id: int,
-            modelo: str | None = None,
-            cor: str | None = None,
-            ano: int | None = None,
-            placa: str | None = None,
-            cambio: str | None = None,
-            categoria: str | None = None,
-            quilometragem: int | None = None,
-            diaria: float | None = None,
-            seguro: float | None = None,
-            disponivel: bool | str | None = None
-    ):
-        if veiculo_id > len(self.__lista):
-            raise Exception("Id de veículo inexistente")
-        if modelo is not None:
-            self.__lista[veiculo_id].set_modelo(modelo)
-        if cor is not None:
-            self.__lista[veiculo_id].set_cor(cor)
-        if ano is not None:
-            self.__lista[veiculo_id].set_ano(ano)
-        if placa is not None:
-            self.__lista[veiculo_id].set_placa(placa)
-        if cambio is not None:
-            self.__lista[veiculo_id].set_cambio(cambio)
-        if categoria is not None:
-            self.__lista[veiculo_id].set_categoria(categoria)
-        if quilometragem is not None:
-            self.__lista[veiculo_id].set_quilometragem(quilometragem)
-        if diaria is not None:
-            self.__lista[veiculo_id].set_diaria(diaria)
-        if seguro is not None:
-            self.__lista[veiculo_id].set_seguro(seguro)
-        if disponivel is not None:
-            if type(disponivel) is str:
-                self.__lista[veiculo_id].set_disponivel(disponivel.upper == "SIM")
-            else:
-                self.__lista[veiculo_id].set_disponivel(disponivel)
-        self.__salvo = False
-
     def is_salvo(self):
         return self.__salvo

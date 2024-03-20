@@ -1,18 +1,20 @@
+from Carros import *
 import datetime
 
 
 class Carro:
-    __id = None
-    __modelo = None
-    __cor = None
-    __ano = None
-    __placa = None
-    __cambio = None
-    __categoria = None
-    __quilometragem = None
-    __aluguelPorDia = None
-    __seguroPorDia = None
-    __disponivel = None
+    __id: int | None = None
+    __modelo: str | None = None
+    __cor: str | None = None
+    __ano: int | None = None
+    __placa: str | None = None
+    __cambio: str | None = None
+    __categoria: str | None = None
+    __quilometragem: int | None = None
+    __aluguelPorDia: float | None = None
+    __seguroPorDia: float | None = None
+    __disponivel: bool | None = None
+    __pai: Carros | None = None
 
     def set_id(self, novo_id: int) -> None:
         """
@@ -24,6 +26,8 @@ class Carro:
         :raises ValueError: Caso o novo_id não for um número inteiro
         """
         self.__id = int(novo_id)
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_id(self) -> int:
         """
@@ -45,6 +49,8 @@ class Carro:
         if novo_modelo.upper() not in ("KWID", "POLO", "RENEGADE", "T-CROSS", "COROLLA", "HILUX"):
             raise ValueError("Modelo inválido")
         self.__modelo = novo_modelo.capitalize()
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_modelo(self) -> str:
         """
@@ -66,6 +72,8 @@ class Carro:
         if nova_cor.upper() in ("PRETO", "CINZA"):
             raise ValueError("Cor inválida")
         self.__cor = nova_cor.capitalize()
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_cor(self) -> str:
         """
@@ -87,6 +95,8 @@ class Carro:
         if novo_ano > datetime.datetime.now().year + 1 or novo_ano < 1886:
             raise ValueError("Ano inválido")
         self.__ano = novo_ano
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_ano(self) -> int:
         """
@@ -115,6 +125,8 @@ class Carro:
             raise ValueError("Placa inválida")
         nova_placa = "{}-{}".format(nova_placa[:3], nova_placa[len(nova_placa) - 4:len(nova_placa)].upper())
         self.__placa = nova_placa
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_placa(self) -> str:
         """
@@ -136,6 +148,8 @@ class Carro:
         if str(novo_cambio).upper() not in ("AUTOMATICO", "AUTOMÁTICO", "MANUAL"):
             raise ValueError("Cambio inválido")
         self.__cambio = "Automático" if str(novo_cambio).upper() in ("AUTOMATICO", "AUTOMÁTICO") else "Manual"
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_cambio(self) -> str:
         """
@@ -165,6 +179,8 @@ class Carro:
             nova_categoria = "Intermediário"
 
         self.__categoria = nova_categoria.capitalize()
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_categoria(self) -> str:
         """
@@ -190,6 +206,8 @@ class Carro:
             raise ValueError("Quilometragem inválida")
 
         self.__quilometragem = int(nova_quilometragem)
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_quilometragem(self) -> int:
         """
@@ -218,6 +236,8 @@ class Carro:
             raise ValueError("Val1or para diária inválido inválido")
 
         self.__aluguelPorDia = float(nova_diaria)
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_diaria(self) -> float:
         """
@@ -245,6 +265,8 @@ class Carro:
             raise ValueError("Quilometragem inválida")
 
         self.__seguroPorDia = float(novo_seguro)
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_seguro(self) -> float:
         """
@@ -272,6 +294,8 @@ class Carro:
             raise TypeError("Valor inválido para disponível")
 
         self.__disponivel = novo_disponivel
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def is_disponivel(self) -> bool:
         """
@@ -294,6 +318,7 @@ class Carro:
         diaria: float | None = None,
         seguro: float | None = None,
         disponivel: bool | str | None = None,
+        pai: Carros | None = None,
         vazio: bool = False
     ) -> None:
         """
@@ -321,6 +346,8 @@ class Carro:
         :type seguro: float | None
         :param disponivel: "Sim", "Não", "True" ou "False". Não é case-sensitive
         :type disponivel: str | bool | None
+        :param pai: Objeto a qual o objeto Carro está associado
+        :type pai: Carros | None
         :param vazio: Se o objeto deve ser inicializado vazio defina como True
         :type vazio: bool
         """
@@ -336,6 +363,7 @@ class Carro:
             self.set_diaria(diaria)
             self.set_seguro(seguro)
             self.set_disponivel(disponivel)
+            self.__pai = pai
 
     @staticmethod
     def decimal_para_float(valor: str) -> float:
