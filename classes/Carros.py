@@ -35,7 +35,8 @@ class Carros:
                             int(linha[7]),
                             float(linha[8]),
                             int(linha[9]),
-                            bool(linha[10] == "Sim")
+                            bool(linha[10] == "Sim"),
+                            self
                         )
                     )
         except FileNotFoundError:
