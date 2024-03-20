@@ -146,18 +146,21 @@ class Carro:
     def is_disponivel(self) -> bool:
         return self.__disponivel
 
-    def __init__(self, id_carro: int | None = None,
-                 modelo: str | None = None,
-                 cor: str | None = None,
-                 ano: int | None = None,
-                 placa: str | None = None,
-                 cambio: str | None = None,
-                 categoria: str | None = None,
-                 quilometragem: int | None = None,
-                 diaria: float = None,
-                 seguro: float = None,
-                 disponivel: bool = None,
-                 vazio: bool = False) -> None:
+    def __init__(
+        self,
+        id_carro: int | None = None,
+        modelo: str | None = None,
+        cor: str | None = None,
+        ano: int | None = None,
+        placa: str | None = None,
+        cambio: str | None = None,
+        categoria: str | None = None,
+        quilometragem: int | None = None,
+        diaria: float = None,
+        seguro: float = None,
+        disponivel: bool = None,
+        vazio: bool = False
+    ) -> None:
         if not vazio:
             self.set_id(id_carro)
             self.set_modelo(modelo)
@@ -194,3 +197,16 @@ class Carro:
         ):
             return False
         return True
+
+    def get_linha(self) -> tuple:
+        return (
+            self.get_id(),
+            self.get_modelo(),
+            self.get_cor(),
+            self.get_ano(),
+            self.get_placa(),
+            self.get_cambio(),
+            self.get_diaria(),
+            self.get_seguro(),
+            "Sim" if self.is_disponivel() else "Não"
+        )
