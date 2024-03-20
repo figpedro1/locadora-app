@@ -5,10 +5,23 @@ from Carro import *
 
 
 class Carros:
+    """
+    Uma lista de instâncias de Carro, geradas a partir de um arquivo CSV com os dados.
+
+    Atributos:
+    ----------
+        __lista: list[Carro] = Lista de todas as instâncias de carro
+
+        __salvo: bool = Indica se o arquivo está salvo
+
+        __caminho_para_arquivo: str = Caminho para o arquivo CSV
+
+        novo_carro: Carro = Instância de carro vazio, para ser preenchido e adicionado ao CSV
+    """
     __lista: list[Carro] = []
-    __salvo = False
-    __caminho_para_arquivo = None
-    novo_carro = Carro(vazio=True)
+    __salvo: bool = False
+    __caminho_para_arquivo: str = None
+    novo_carro: Carro = Carro(vazio=True)
 
     def __init__(self, caminho_para_arquivo):
         diretorio, arquivo = os.path.split(caminho_para_arquivo)

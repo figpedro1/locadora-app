@@ -3,6 +3,36 @@ import datetime
 
 
 class Carro:
+    """
+    Classe que representa um carro.
+    Atributos com prefixo "__" não devem ser acessados diretamente. Use os getters e setters correspondentes.
+
+    Atributos:
+    ----------
+        __id: int = ID do carro.
+
+        __modelo: str = "Kwid", "Polo", "Rengegade", "T-Cross", "Corolla" ou "Hilux".
+
+        __cor: str = "Preto" ou "Cinza"
+
+        __ano: int = Ano do carro
+
+        __placa: str = Placa do carro no formato XXX-XXXX
+
+        __cambio: str = "Manual" ou "Automático"
+
+        __categoria: str = "Econômico", "Intermediário", "Conforto" ou "Pickup".
+
+        __quilometragem: int = Quilometragem do carro
+
+        __aluguelPorDia: float = Valor do aluguel do carro (por dia)
+
+        __seguroPorDia: float = Valor do seguro do carro (por dia)
+
+        __disponivel: bool = True se o carro estiver disponível, False caso contrário
+
+        __pai: Carros = Objeto Carros a qual está associada
+    """
     __id: int | None = None
     __modelo: str | None = None
     __cor: str | None = None
