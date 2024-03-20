@@ -1,19 +1,25 @@
+from Clientes import *
+
+
 class Cliente:
     """
     Classe que representa um único cliente.
+    Todos os atributos são privados, como denota o prefixo "__".
+    Getters e setters devem ser usados para manipular os atributos.
 
-    :param cpf: CPF do cliente, formatado como XXX.XXX.XXX-XX
-    :type cpf: str
-    :param nome: Nome do cliente
-    :type nome: str
-    :param idade: Idade do cliente
-    :type idade: int
-    :param endereco: Endereco do cliente
-    :type endereco: str
-    :param cidade: Cidade do cliente
-    :type cidade: str
-    :param estado: Estado do cliente
-    :type estado: str
+    Atributos:
+    __________
+        __cpf: str = CPF do cliente, formatado como XXX.XXX.XXX-XX
+
+        __nome: str = Nome do cliente
+
+        __idade: int = Idade do cliente
+
+        __endereco: str = Endereco do cliente
+
+        __cidade: str = Cidade do cliente
+
+        __estado: str = Estado do cliente
     """
     __cpf: str | None = None
     __nome: str | None = None
@@ -21,6 +27,7 @@ class Cliente:
     __endereco: str | None = None
     __cidade: str | None = None
     __estado: str | None = None
+    __pai: Clientes | None = None
 
     def set_cpf(self, novo_cpf: str) -> None:
         """
@@ -30,6 +37,8 @@ class Cliente:
         :rtype: None
         """
         self.__cpf = self.formatar_cpf(novo_cpf)
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     @staticmethod
     def formatar_cpf(cpf: str | int) -> str:
@@ -102,6 +111,8 @@ class Cliente:
         :rtype: None
         """
         self.__nome = str(novo_nome)
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_nome(self) -> str:
         """
@@ -122,6 +133,8 @@ class Cliente:
         if nova_idade < 0:
             raise ValueError("Idade não pode ser negativa")
         self.__idade = nova_idade
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_idade(self) -> int:
         """
@@ -139,6 +152,8 @@ class Cliente:
         :rtype: None
         """
         self.__endereco = str(novo_endereco)
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_endereco(self) -> str:
         """
@@ -156,6 +171,8 @@ class Cliente:
         :rtype: None
         """
         self.__cidade = str(nova_cidade)
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_cidade(self) -> str:
         """
@@ -173,6 +190,8 @@ class Cliente:
         :rtype: None
         """
         self.__estado = str(novo_estado)
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def get_estado(self) -> str:
         """
@@ -180,7 +199,8 @@ class Cliente:
         :return: Estado do cliente
         :rtype: str
         """
-        return self.__estado
+        if self.__pai is not None:
+            self.__pai.__salvo = False
 
     def __init__(
         self,
@@ -190,6 +210,7 @@ class Cliente:
         endereco: str,
         cidade: str,
         estado: str,
+        pai: Clientes | None = None,
         vazio: bool = False
     ) -> None:
         """
@@ -207,6 +228,8 @@ class Cliente:
         :type cidade: str
         :param estado: Estado do cliente
         :type estado: str
+        :param pai: Objeto Clientes a qual o objeto Cliente é associado
+        :type pai: Clientes | None
         :param vazio: Deve ser definido como True caso deseje iniciar um objeto vazio
         :type vazio: bool
         """
@@ -217,6 +240,7 @@ class Cliente:
             self.set_endereco(endereco)
             self.set_cidade(cidade)
             self.set_estado(estado)
+            self.__pai = pai
 
     def get_linha(self) -> tuple:
         """
