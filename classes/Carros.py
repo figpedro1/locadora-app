@@ -204,7 +204,7 @@ class Carro:
         """
         if str(nova_categoria).upper() not in ("ECONÔMICO", "ECONOMICO", "INTERMEDIÁRIO",
                                                "INTERMEDIARIO", "CONFORTO", "PICKUP"):
-            raise ValueError("Categoria inválida")
+            raise ValueError("Categoria inválida: " + nova_categoria)
 
         if nova_categoria.upper() == "ECONOMICO":
             nova_categoria = "Econômico"
@@ -474,6 +474,7 @@ class Carros:
     __salvo: bool = False
     __caminho_para_arquivo: str = None
     __novo_carro: Carro = Carro(vazio=True)
+    __id_por_classificacao: dict = {}
 
     def __init__(self, caminho_para_arquivo):
         diretorio, arquivo = os.path.split(caminho_para_arquivo)
@@ -481,6 +482,8 @@ class Carros:
             os.makedirs(diretorio)
             if not os.path.isdir(diretorio):
                 raise ValueError("Caminho inválido")
+
+        self.__id_por_classificacao = {}
 
         try:
             with open(caminho_para_arquivo, 'r', newline="") as arquivo:
@@ -504,6 +507,14 @@ class Carros:
                             self
                         )
                     )
+                    if linha[5] not in self.__id_por_classificacao:
+                        self.__id_por_classificacao[linha[5]] = {}
+                    if linha[6] not in self.__id_por_classificacao[linha[5]]:
+                        self.__id_por_classificacao[linha[5]][linha[6]] = []
+                    self.__id_por_classificacao[linha[5]][linha[6]].append(int(linha[0]))
+                print(self.__id_por_classificacao)
+
+
         except FileNotFoundError:
             with open(caminho_para_arquivo, 'w', newline="") as arquivo:
                 escritor = csv.writer(arquivo, delimiter=";")
