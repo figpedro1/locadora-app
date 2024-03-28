@@ -335,7 +335,7 @@ class Clientes:
         self.__caminho_para_arquivo = caminho_para_arquivo
 
         try:
-            with (open(self.__caminho_para_arquivo, newline="") as arquivo):
+            with open(self.__caminho_para_arquivo, newline="") as arquivo:
                 arquivo_csv = csv.reader(arquivo, delimiter=";")
                 next(arquivo_csv, None)
 
