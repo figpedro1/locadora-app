@@ -1,17 +1,22 @@
-from Clientes import Cliente
+from Clientes import *
+from Carros import *
+import datetime
 
-class Locacoes:
+class Locacao:
     """
-    Classe para todas as locações
+    Classe para iniciar uma nova locação
     Todos os atributos são privados, como denota o prefixo "__".
     Set's são utilizados para atribuir valores aos atributos,
     Get's são utilizados para devolver os valores dos atributos.
 
     Atributos
     ---------------
-        __idLocacao: int = id da locação, não podendo ser menor do que 0
+        __cpf_cliente: str = cpf do cliente que deseja fazer uma nova locação
     
     """
+    
+    '''
+    Código lixo, caso precise usar depois:
     __idLocacao: int | None = None
     __idCarro: int | None = None
     __cpfCliente: str | None = None
@@ -22,6 +27,7 @@ class Locacoes:
     __seguro: str | None = "Não"
     __valorTotal: float = 0
 
+    #Set e Get do id da Locação
     def set_idLocacao(self, novoIdLocacao: int) -> None:
         novoIdLocacao = int(novoIdLocacao)
         if novoIdLocacao < 0:
@@ -30,32 +36,78 @@ class Locacoes:
     
     def get_idLocacao(self) -> int:
         return self.__idLocacao
+    '''
+    __cpf_cliente: str | None = None
+    __categoria: str | None = None
+    __cambio: str | None = None
+    __seguro: str | None = None
+    __disponivel: bool = False
 
-    def set_cpfCliente(self, novoCpf: str) -> None:
-        self.__cpfCliente = Cliente.formatar_cpf(novoCpf)
+    def __init__(self, 
+                 cpf_cliente: str | None =None,
+                 categoria: str | None = None,
+                 cambio: str | None = None,
+                 seguro: str | None = None,
+                 vazio: bool = False
+                 ) -> None:
+        if not vazio:
+            self.set_cpf_cliente(cpf_cliente)
+            self.set_categoria(categoria)
+            self.set_cambio(cambio)
+            self.set_seguro(seguro)
 
-    def get_cpfCliente(self) -> str:
-        return self.__cpfCliente
+    #Set e Get do CPF do cliente
+    def set_cpf_cliente(self, novoCpf: str) -> None:
+        """
+        Atribui o CPF do cliente na classe Locações
+        """
+        self.__cpf_cliente = Cliente.formatar_cpf(novoCpf)
+
+    def get_cpf_cliente(self) -> str:
+        return self.__cpf_cliente
+
+    def set_categoria(self, ctgoria: str) -> None:
+        if str(ctgoria).upper() not in ("ECONÔMICO", "ECONOMICO", "INTERMEDIÁRIO", "INTERMEDIARIO", "CONFORTO", "PICKUP"):
+            raise ValueError("Categoria inválida")
+        if str(ctgoria).upper() == "ECONOMICO":
+            ctgoria = "Econômico"
+        if str(ctgoria).upper() == "INTERMEDIARIO":
+            ctgoria = "Itermediário"
+        self.__categoria = str(ctgoria).capitalize()
     
-    def set_kmInicial(self, kilometragemI: int) -> None:
-        kilometragemI = int(kilometragemI)
-        if kilometragemI < 0:
-            raise ValueError
-        self.__kmInicial = kilometragemI
+    def get_categoria(self) -> str:
+        return self.__categoria
 
-    def get_kmInicial(self) -> int:
-        return self.__kmInicial
+    def set_cambio(self, cambio: str) -> None:
+        if str(cambio).upper() not in ("MANUAL", "AUTOMÁTICO", "AUTOMATICO"):
+            raise ValueError("Câmbio inválido")
+        if str(cambio).upper() == "AUTOMATICO":
+            cambio = "Automático"
+        self.__cambio = cambio.capitalize()
+    
+    def get_cambio(self) -> str:
+        return self.__cambio
 
+    def set_seguro(self, seguro: str) -> None:
+        if str(seguro).upper() not in ("SIM", "NÃO", "NAO"):
+            raise ValueError("Resposta inválida")
+        if str(seguro).upper() == "NAO":
+            seguro = "Não"
+        self.__seguro = str(seguro).capitalize()
+    
+    def get_seguro(self) -> str:
+        return self.__seguro
+    
 
 #Testando a classe de locacao
-locacao = Locacoes
-novoId = int(input('Digite o id de locacao: '))
-kmI = int(input('Digite a kilometragem inicial: '))
-cpfCliente = input('Digite seu cpf: ')
-locacao.set_idLocacao(locacao, novoId)
-locacao.set_cpfCliente(locacao, cpfCliente)
-locacao.set_kmInicial(locacao, kmI)
-print('-'*40)
-print("O id de locacao é: ", locacao.get_idLocacao(locacao))
-print('O cpf do cliente é: ', locacao.get_cpfCliente(locacao))
-print("O km inicial é: ", locacao.get_kmInicial(locacao))
+nova_locacao = Locacao(cpf_cliente=str(input('Digite seu cpf: ')), 
+                       categoria=str(input('Digite a categoria: ')),
+                       cambio=str(input('Digite o câmbio: ')),
+                       seguro=str(input('Deseja seguro?\nSIM | NÃO\n')))
+
+print('-'*30)
+print(nova_locacao.get_cpf_cliente())
+
+#Testando como pegar a lista de carros, necessário para a pesquisa de carros disponíveis com o câmbio e categoria desejada do cliente
+lista_carro = Carros(caminho_para_arquivo=".\locadora_app\Carro.csv")
+print(lista_carro.get_carro(1))
