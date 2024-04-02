@@ -47,7 +47,7 @@ class Carro:
     __disponivel: bool | None = None
     __pai: None = None
 
-    def get_pai(self) -> object:
+    def get_pai(self):
         return self.__pai
 
     def set_id(self, novo_id: int) -> None:
@@ -204,7 +204,7 @@ class Carro:
         """
         if str(nova_categoria).upper() not in ("ECONÔMICO", "ECONOMICO", "INTERMEDIÁRIO",
                                                "INTERMEDIARIO", "CONFORTO", "PICKUP"):
-            raise ValueError("Categoria inválida")
+            raise ValueError("Categoria inválida: " + nova_categoria)
 
         if nova_categoria.upper() == "ECONOMICO":
             nova_categoria = "Econômico"
@@ -351,7 +351,7 @@ class Carro:
         diaria: float | None = None,
         seguro: float | None = None,
         disponivel: bool | str | None = None,
-        pai: None = None,
+        pai: object | None = None,
         vazio: bool = False
     ) -> None:
         """
@@ -474,6 +474,7 @@ class Carros:
     __salvo: bool = False
     __caminho_para_arquivo: str = None
     __novo_carro: Carro = Carro(vazio=True)
+    __id_por_classificacao: dict = {}
 
     def __init__(self, caminho_para_arquivo):
         diretorio, arquivo = os.path.split(caminho_para_arquivo)
@@ -481,6 +482,8 @@ class Carros:
             os.makedirs(diretorio)
             if not os.path.isdir(diretorio):
                 raise ValueError("Caminho inválido")
+
+        self.__id_por_classificacao = {}
 
         try:
             with open(caminho_para_arquivo, 'r', newline="") as arquivo:
@@ -504,6 +507,12 @@ class Carros:
                             self
                         )
                     )
+                    if linha[5] not in self.__id_por_classificacao:
+                        self.__id_por_classificacao[linha[5]] = {}
+                    if linha[6] not in self.__id_por_classificacao[linha[5]]:
+                        self.__id_por_classificacao[linha[5]][linha[6]] = []
+                    self.__id_por_classificacao[linha[5]][linha[6]].append(int(linha[0]))
+
         except FileNotFoundError:
             with open(caminho_para_arquivo, 'w', newline="") as arquivo:
                 escritor = csv.writer(arquivo, delimiter=";")
@@ -525,10 +534,10 @@ class Carros:
     def tam(self) -> int:
         return len(self.__lista)
 
-    def get_carro(self, id) -> Carro:
-        if int(id) > len(self.__lista) - 1:
+    def get_carro(self, id_carro) -> Carro:
+        if int(id_carro) > len(self.__lista) - 1:
             raise ValueError("Indíce inexistente")
-        return self.__lista[id]
+        return self.__lista[id_carro]
 
     def get_novo_carro(self) -> Carro:
         return self.__novo_carro
@@ -570,6 +579,35 @@ class Carros:
             for item in self.__lista:
                 escritor.writerow(item.get_linha())
             self.__salvo = True
+
+    def get_id_categoria(self, cambio: str, categoria: str) -> list:
+        """
+        Retorna uma lista com o id de todos os carros que preenchem os requisitos de câmbio e categoria
+        :param cambio: "Manual" ou "Automatico". Não é case-sensitive
+        :type cambio: str
+        :param categoria: "Econômico", "Intermediário", "Conforto" ou "Pickup". Não é case-sensitive
+        :type categoria: str
+        :return: Lista de inteiros com o id dos carros cumpram os requisitos
+        :rtype: list
+        """
+        if cambio.upper() not in ("MANUAL", "AUTOMATICO", "AUTOMÁTICO"):
+            raise ValueError("Cambio inválido: " + cambio)
+        if categoria.upper() not in ("ECONÔMICO", "ECONOMICO", "INTERMEDIÁRIO", "INTERMEDIARIO", "CONFORTO", "PICKUP"):
+            raise ValueError("Categoria inválida: " + categoria)
+        cambio = ("Automático" if cambio.upper() == "AUTOMATICO" or cambio.upper() == "AUTOMÁTICO" else "Manual")
+        if categoria.upper() == "INTERMEDIARIO":
+            categoria = "Intermediário"
+        if categoria.upper() == "ECONOMICO":
+            categoria = "Econômico"
+        cambio = cambio.capitalize()
+        categoria = categoria.capitalize()
+
+        if cambio not in self.__id_por_classificacao:
+            raise IndexError("Nenhum carro com câmbio " + cambio.lower() + " encontrado.")
+        if categoria not in self.__id_por_classificacao[cambio]:
+            raise IndexError("Nenhum carro da categoria " + categoria.lower() + " encontrado.")
+
+        return self.__id_por_classificacao[cambio][categoria]
 
     def set_salvo(self, salvo):
         self.__salvo = salvo
