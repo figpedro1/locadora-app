@@ -88,11 +88,7 @@ class Locacao:
     def set_data_locacao(self, data_locacao: dict | str) -> None:
         if type(data_locacao) == str:
             if data_locacao != "":
-                nova_data = data_locacao.split(sep="/;")
-                self.__data_locacao['dia'] = int(nova_data[0])
-                self.__data_locacao['mes'] = int(nova_data[1])
-                self.__data_locacao['ano'] = int(nova_data[2])
-                self.__data_locacao['hora'] = int(nova_data[3])
+                self.__data_locacao = data_locacao
             else:
                 raise ValueError("A data não pode ser uma string vazia")
         elif type(data_locacao) == dict:
@@ -109,11 +105,7 @@ class Locacao:
     def set_data_devolucao(self, data_devolucao: dict | str) -> None:
         if type(data_devolucao) == str:
             if data_devolucao != "":
-                nova_data = data_devolucao.split("/;")
-                self.__data_devolucao['dia'] = int(nova_data[0])
-                self.__data_devolucao['mes'] = int(nova_data[1])
-                self.__data_devolucao['ano'] = int(nova_data[2])
-                self.__data_devolucao['hora'] = int(nova_data[3])
+                self.__data_devolucao = data_devolucao
             else:
                 raise ValueError("A data não pode ser uma string vazia")
         elif type(data_devolucao) == dict:
@@ -170,7 +162,6 @@ class Locacao:
 
 class Locacoes:
     __lista: list = []
-    __nome_arquivo: str = None
 
     def __init__(self, nome_arquivo="Locacoes.csv") -> None:
         try:
@@ -179,49 +170,75 @@ class Locacoes:
             campos = csv.DictReader(arquivo_locacoes, delimiter=';')
             for linhas in campos:
                 locacoes = {}
-                locacoes['idLoc'] = linhas['Id Locacao']
-                locacoes['idCarro'] = linhas['Id Carro']
-                locacoes['cpf'] = linhas['CPF']
-                locacoes['dataLoc'] = linhas['Data Locacao']
-                locacoes['dataDevol'] = linhas['Data Devolucao']
-                locacoes['kmI'] = linhas['Km Inicial']
-                locacoes['kmF'] = linhas['Km Final']
-                locacoes['seguro'] = linhas['Seguro']
-                locacoes['valorT'] = linhas['Valor Total']
+                locacoes['IdLocacao'] = linhas['IdLocacao']
+                locacoes['IdCarro'] = linhas['IdCarro']
+                locacoes['CPF'] = linhas['CPF']
+                locacoes['DataLocacao'] = linhas['DataLocacao']
+                locacoes['DataDevolucao'] = linhas['DataDevolucao']
+                locacoes['KmInicial'] = linhas['KmInicial']
+                locacoes['KmFinal'] = linhas['KmFinal']
+                locacoes['Seguro'] = linhas['Seguro']
+                locacoes['ValorTotal'] = linhas['ValorTotal']
                 self.__lista.append(locacoes)
             arquivo_locacoes.close()
         except FileNotFoundError:
             arquivo_locacoes = open(nome_arquivo, "a", newline="")
             campos = csv.writer(arquivo_locacoes, delimiter=';')
             campos.writerow((
-                "Id Locacao",
-                "Id Carro",
+                "IdLocacao",
+                "IdCarro",
                 "CPF",
-                "Data Locacao",
-                "Data Devolucao",
-                "Km Inicial",
-                "Km Final",
+                "DataLocacao",
+                "DataDevolucao",
+                "KmInicial",
+                "KmFinal",
                 "Seguro",
-                "Valor Total"
+                "ValorTotal"
             ))
             arquivo_locacoes.close()
 
     def get_lista(self) -> dict:
         return self.__lista
     
+    @staticmethod
+    def atualiza_arquivo(self) -> None:   
+        nome_arquivo = "Locacoes.csv"
+        try:
+            arquivo = open(nome_arquivo, "w", newline="")
+            campos = ["IdLocacao",
+                "IdCarro",
+                "CPF",
+                "DataLocacao",
+                "DataDevolucao",
+                "KmInicial",
+                "KmFinal",
+                "Seguro",
+                "ValorTotal"
+            ]
+            manipulador = csv.DictWriter(arquivo, fieldnames=campos, delimiter=';')
+            manipulador.writeheader()
+            manipulador.writerows(self.__lista)
+            arquivo.close()
+        except OSError as err:
+            raise OSError("Não foi possível abrir o arquivo")
+    
     def add_locacao(self, nova_locacao: Locacao) -> None:
         locacao = {}
-        locacao['idLoc'] = nova_locacao.get_id_locacao()
-        locacao['idCarro'] = nova_locacao.get_id_carro()
-        locacao['cpf'] = nova_locacao.get_cpf_cliente()
-        locacao['dataLoc'] = nova_locacao.get_data_locacao()
-        locacao['dataDevol'] = nova_locacao.get_data_devolucao()
-        locacao['kmInicial'] = nova_locacao.get_km_inicial()
-        locacao['kmFinal'] = nova_locacao.get_km_final()
-        locacao['seguro'] = nova_locacao.get_seguro()
-        locacao['valorT'] = nova_locacao.get_valor_total()
+        locacao['IdLocacao'] = nova_locacao.get_id_locacao()
+        locacao['IdCarro'] = nova_locacao.get_id_carro()
+        locacao['CPF'] = nova_locacao.get_cpf_cliente()
+        locacao['DataLocacao'] = nova_locacao.get_data_locacao()
+        locacao['DataDevolucao'] = nova_locacao.get_data_devolucao()
+        locacao['KmInicial'] = nova_locacao.get_km_inicial()
+        locacao['KmFinal'] = nova_locacao.get_km_final()
+        locacao['Seguro'] = nova_locacao.get_seguro()
+        locacao['ValorTotal'] = nova_locacao.get_valor_total()
         self.__lista.append(locacao)
 
+
+testeLoc = Locacao(0, 0, "065.599.521-85", "10/12/2021 10:45", "00/00/00 00:00", 0, 10, "Nao", 0)
 teste = Locacoes()
+teste.add_locacao(testeLoc)
+teste.atualiza_arquivo(teste)
+print(f'id locacao: {testeLoc.get_id_locacao()}\nid carro: {testeLoc.get_id_carro()}\ncpf cliente: {testeLoc.get_cpf_cliente()}\ndata locacao: {testeLoc.get_data_locacao()}\ndata devolucao: {testeLoc.get_data_devolucao()}\nkm inicail: {testeLoc.get_km_inicial()}\nkm final: {testeLoc.get_km_final()}\nseguro: {testeLoc.get_seguro()}\nvalor total: {testeLoc.get_valor_total()}')
 print(teste.get_lista())
-        
