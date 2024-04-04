@@ -1,6 +1,7 @@
 from Clientes import *
 from Carros import *
 import csv
+from datetime import datetime
 
 class Locacao:
     """
@@ -26,25 +27,48 @@ class Locacao:
     __id_locacao: int | None = 0
     __id_carro: int | None = None
     __cpf_cliente: str | None = None
-    __data_locacao: dict = None
-    __data_devolucao: dict | None = None
+    __data_locacao: dict | str | None = datetime.now().strftime('%d/%m/%Y %H:%M')
+    __data_devolucao: dict | str | None = "00/00/00 00:00"
     __km_inicial: int | None = 0
     __km_final: int | None = 0
-    __seguro: str | None = "Não"
+    __seguro: str | None = None
     __valor_total: float = 0
 
     def __init__(self, 
-                 id_locacao: int = None,
+                 id_locacao: int = 0,
                  id_carro: int = None,
                  cpf_cliente: str | None =None,      
-                 data_locacao: dict = None,
-                 data_devolucao: dict = None,
+                 data_locacao: str = datetime.now().strftime('%d/%m/%Y %H:%M'),
+                 data_devolucao: str = "00/00/00 00:00",
                  km_inicial: int = 0,
                  km_final: int = 0,
                  seguro: str = None,
                  valor_total: float = None,
                  vazio: bool = False
                  ) -> None:
+        """
+        Inicializador da classe "Locacao".
+        
+        :param id_locacao: ID de uma nova locação.
+        :type id_locacao: int | None
+        :param id_carro: ID do carro escolhido.
+        :type id_carro: int | None
+        :param cpf_cliente: CPF do cliente que está realizando a locação.
+        :type cpf_cliente: str | None
+        :param data_locacao: Data da locação, por padrão é o dia atual.
+        :type data_locacao: dict | str | None
+        :param data_devolucao: Data da devolução, por padrão é 00/00/00.
+        :type data_devolucao: dict | str | None
+        :param km_inicial: Quilometragem do carro locado no dia da locação, por padrão, o valor é 0.
+        :type km_inicial: int | None
+        :param km_final: Quilometragem do carro locado no dia da devolução, por padrão, o valor é 0.
+        :type km_final: int | None
+        :param seguro: "Sim", "Não", "Nao". Não precisa ser escrito necessariamente dessa forma.
+        :type seguro: str | None
+        :param valor_total: Valor total da locação.
+        :type valor_total: float | None
+        :return: None
+        """
         if not vazio:
             self.set_id_locacao(id_locacao)
             self.set_id_carro(id_carro)
@@ -58,16 +82,37 @@ class Locacao:
 
 
     #Set e Get do id da Locação
-    def set_id_locacao(self, novo_id_locacao: int) -> None:
-        novo_id_locacao = int(novo_id_locacao)
-        if novo_id_locacao < 0:
-            raise ValueError("Id não pode ser negativo")
-        self.__idLocacao = novo_id_locacao
+    def set_id_locacao(self, novo_id) -> None:
+        """
+        Atribui um novo valor de ID da locação. 
+        Sendo que esse valor não poderá ser menor que 0.
+        
+        :param novo_id: Novo id de locação
+        :return: None
+        :raises ValueError: Caso o valor seja menor que 0
+        """
+        if novo_id < 0:
+            raise ValueError("O Id não pode ser menor que 0")
+        self.__id_locacao = int(novo_id)
     
     def get_id_locacao(self) -> int:
-        return self.__idLocacao
+        """
+        Retorna o valor do id da locação.
+        :return: Valor do id locação.
+        :rtype: int
+        """
+        return self.__id_locacao
 
+    #Set e Get do id do carro
     def set_id_carro(self, id_carro: int) -> None:
+        """
+        Atribui um novo ID do carro locado.
+        Sendo que esse valor não poderá ser menor que 0.
+
+        :param id_carro: Id do carro locado.
+        :return: None
+        :raises ValueError: Caso o valor seja menor que 0.
+        """
         if id_carro < 0:
             raise ValueError("Id não pode ser negaivo")
         self.__id_carro = id_carro
@@ -88,14 +133,21 @@ class Locacao:
     def set_data_locacao(self, data_locacao: dict | str) -> None:
         if type(data_locacao) == str:
             if data_locacao != "":
-                self.__data_locacao = data_locacao
+                self.__data_locacao = {}
+                self.__data_locacao['dia'] = data_locacao.split('/')[0]
+                self.__data_locacao['mes'] = data_locacao.split('/')[1]
+                ano = str(data_locacao.split(' ')[0])
+                self.__data_locacao['ano'] = ano.split('/')[2]
+                self.__data_locacao['hora'] = str(data_locacao.split(' ')[1])
+
             else:
                 raise ValueError("A data não pode ser uma string vazia")
         elif type(data_locacao) == dict:
-            self.__data_locacao['dia'] = int(data_locacao['dia'])
-            self.__data_locacao['mes'] = int(data_locacao['mes'])
-            self.__data_locacao['ano'] = int(data_locacao['ano'])
-            self.__data_locacao['hora'] = int(data_locacao['hora'])
+            self.__data_locacao = {}
+            self.__data_locacao['dia'] = data_locacao['dia']
+            self.__data_locacao['mes'] = data_locacao['mes']
+            self.__data_locacao['ano'] = data_locacao['ano']
+            self.__data_locacao['hora'] = data_locacao['hora']
         else:
             raise TypeError("A data precisa ser uma string XX/XX/XXXX XX:XX ou um dicionário")
         
@@ -105,14 +157,20 @@ class Locacao:
     def set_data_devolucao(self, data_devolucao: dict | str) -> None:
         if type(data_devolucao) == str:
             if data_devolucao != "":
-                self.__data_devolucao = data_devolucao
+                self.__data_devolucao = {}
+                self.__data_devolucao['dia'] = data_devolucao.split('/')[0]
+                self.__data_devolucao['mes'] = data_devolucao.split('/')[1]
+                ano = str(data_devolucao.split(' ')[0])
+                self.__data_devolucao['ano'] = ano.split('/')[2]
+                self.__data_devolucao['hora'] = str(data_devolucao.split(' ')[1])
             else:
                 raise ValueError("A data não pode ser uma string vazia")
         elif type(data_devolucao) == dict:
-            self.__data_devolucao['dia'] = int(data_devolucao['dia'])
-            self.__data_devolucao['mes'] = int(data_devolucao['mes'])
-            self.__data_devolucao['ano'] = int(data_devolucao['ano'])
-            self.__data_devolucao['hora'] = int(data_devolucao['hora'])
+            self.__data_devolucao = {}
+            self.__data_devolucao['dia'] = data_devolucao['dia']
+            self.__data_devolucao['mes'] = data_devolucao['mes']
+            self.__data_devolucao['ano'] = data_devolucao['ano']
+            self.__data_devolucao['hora'] = data_devolucao['hora']
         else:
             raise TypeError("A data precisa ser uma string XX/XX/XXXX XX:XX ou um dicionário")
 
@@ -158,8 +216,10 @@ class Locacao:
     
     def get_valor_total(self) -> float:
         return self.__valor_total
-
-
+    
+#---------------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------------
+#Início classe Locações
 class Locacoes:
     __lista: list = []
 
@@ -200,7 +260,7 @@ class Locacoes:
     def get_lista(self) -> dict:
         return self.__lista
     
-    @staticmethod
+
     def atualiza_arquivo(self) -> None:   
         nome_arquivo = "Locacoes.csv"
         try:
@@ -227,18 +287,26 @@ class Locacoes:
         locacao['IdLocacao'] = nova_locacao.get_id_locacao()
         locacao['IdCarro'] = nova_locacao.get_id_carro()
         locacao['CPF'] = nova_locacao.get_cpf_cliente()
-        locacao['DataLocacao'] = nova_locacao.get_data_locacao()
-        locacao['DataDevolucao'] = nova_locacao.get_data_devolucao()
+        locacao['DataLocacao'] = str(nova_locacao.get_data_locacao()['dia'])+'/'+str(nova_locacao.get_data_locacao()['mes'])+'/'+str(nova_locacao.get_data_locacao()['ano'])+' '+str(nova_locacao.get_data_locacao()['hora']) 
+        locacao['DataDevolucao'] = str(nova_locacao.get_data_devolucao()['dia'])+'/'+str(nova_locacao.get_data_devolucao()['mes'])+'/'+str(nova_locacao.get_data_devolucao()['ano'])+' '+str(nova_locacao.get_data_devolucao()['hora']) 
         locacao['KmInicial'] = nova_locacao.get_km_inicial()
         locacao['KmFinal'] = nova_locacao.get_km_final()
         locacao['Seguro'] = nova_locacao.get_seguro()
         locacao['ValorTotal'] = nova_locacao.get_valor_total()
         self.__lista.append(locacao)
+    
+    def tam(self) -> int:
+        return len(self.__lista)
+    
+    def id_locacoes(self)->int:
+        if self.__lista == []:
+            return 0
+        else:
+            tamanho = self.tam()
+            return int(self.__lista[tamanho-1]['IdLocacao']) + 1
 
-
-testeLoc = Locacao(0, 0, "065.599.521-85", "10/12/2021 10:45", "00/00/00 00:00", 0, 10, "Nao", 0)
+#Testando a funcionalidade das classes e outros
 teste = Locacoes()
-teste.add_locacao(testeLoc)
-teste.atualiza_arquivo(teste)
-print(f'id locacao: {testeLoc.get_id_locacao()}\nid carro: {testeLoc.get_id_carro()}\ncpf cliente: {testeLoc.get_cpf_cliente()}\ndata locacao: {testeLoc.get_data_locacao()}\ndata devolucao: {testeLoc.get_data_devolucao()}\nkm inicail: {testeLoc.get_km_inicial()}\nkm final: {testeLoc.get_km_final()}\nseguro: {testeLoc.get_seguro()}\nvalor total: {testeLoc.get_valor_total()}')
-print(teste.get_lista())
+locaca = Locacao(teste.id_locacoes(), 0, "000.000.000-00", seguro="Sim", valor_total=0, data_devolucao="00/00/00 00:00")
+teste.add_locacao(locaca)
+teste.atualiza_arquivo()
