@@ -1,7 +1,6 @@
 from Clientes import *
-from Carros import *
 import csv
-from datetime import datetime
+from datetime import *
 
 class Locacao:
     """
@@ -13,17 +12,24 @@ class Locacao:
     Atributos
     ---------------
         __id_locacao: int = id da locação 
+
         __id_carro: int = id do carro que foi locado
+
         __cpf_cliente: str = cpf do cliente
+
         __data_locacao: dict = data do início da locação
+
         __data_devolucao: dict = data da devolução do carro
+
         __km_inicial: int = quilometragem do carro antes da locação
+
         __km_final: int = quilometragem do carro depois da locação
+
         __seguro: str = se o cliente deseja obter seguro ou não
+
         __valor_total: float = valor total da locação
     """
     
-
     __id_locacao: int | None = 0
     __id_carro: int | None = None
     __cpf_cliente: str | None = None
@@ -34,6 +40,37 @@ class Locacao:
     __seguro: str | None = None
     __valor_total: float = 0
 
+    @staticmethod
+    def formata_data(data: str | dict) -> dict:
+        """
+        Transforma uma string em um dicionário com os campos 'dia', 'mês', 'ano', 'hora' ou atribui um dicionário com esses campos a um novo dicionário.
+
+        :param data: Uma data qualquer no formata XX/XX/XXXX XX:XX
+        :type data: str | dict
+        :return: Retorna a data no formato de um dicionário com os campos 'dia', 'mês', 'ano', 'hora'
+        :rtype: dict
+        """
+        if type(data) != str and type(data) != dict:
+            raise TypeError("A data pode ser somente uma string ou um dicionário")
+        if type(data) == str:
+            if data == "":
+                raise ValueError("A data não pode ser uma string vazia")
+            else:
+                nova_data = {}
+                nova_data['dia'] = data.split('/')[0]
+                nova_data['mes'] = data.split('/')[1]
+                ano = str(data.split(' ')[0])
+                nova_data['ano'] = ano.split('/')[2]
+                nova_data['hora'] = data.split(' ')[1]
+                return nova_data
+        else:
+            nova_data = {}
+            nova_data['dia'] = data['dia']
+            nova_data['mes'] = data['mes']
+            nova_data['ano'] = data['ano']
+            nova_data['hora'] = data['hora']
+            return nova_data
+
     def __init__(self, 
                  id_locacao: int = 0,
                  id_carro: int = None,
@@ -43,7 +80,7 @@ class Locacao:
                  km_inicial: int = 0,
                  km_final: int = 0,
                  seguro: str = None,
-                 valor_total: float = None,
+                 valor_total: float = 0,
                  vazio: bool = False
                  ) -> None:
         """
@@ -131,48 +168,15 @@ class Locacao:
         return self.__cpf_cliente
     
     def set_data_locacao(self, data_locacao: dict | str) -> None:
-        if type(data_locacao) == str:
-            if data_locacao != "":
-                self.__data_locacao = {}
-                self.__data_locacao['dia'] = data_locacao.split('/')[0]
-                self.__data_locacao['mes'] = data_locacao.split('/')[1]
-                ano = str(data_locacao.split(' ')[0])
-                self.__data_locacao['ano'] = ano.split('/')[2]
-                self.__data_locacao['hora'] = str(data_locacao.split(' ')[1])
-
-            else:
-                raise ValueError("A data não pode ser uma string vazia")
-        elif type(data_locacao) == dict:
-            self.__data_locacao = {}
-            self.__data_locacao['dia'] = data_locacao['dia']
-            self.__data_locacao['mes'] = data_locacao['mes']
-            self.__data_locacao['ano'] = data_locacao['ano']
-            self.__data_locacao['hora'] = data_locacao['hora']
-        else:
-            raise TypeError("A data precisa ser uma string XX/XX/XXXX XX:XX ou um dicionário")
+        self.__data_locacao = {}
+        self.__data_locacao = self.formata_data(data_locacao)
         
     def get_data_locacao(self) -> dict:
         return self.__data_locacao
     
     def set_data_devolucao(self, data_devolucao: dict | str) -> None:
-        if type(data_devolucao) == str:
-            if data_devolucao != "":
-                self.__data_devolucao = {}
-                self.__data_devolucao['dia'] = data_devolucao.split('/')[0]
-                self.__data_devolucao['mes'] = data_devolucao.split('/')[1]
-                ano = str(data_devolucao.split(' ')[0])
-                self.__data_devolucao['ano'] = ano.split('/')[2]
-                self.__data_devolucao['hora'] = str(data_devolucao.split(' ')[1])
-            else:
-                raise ValueError("A data não pode ser uma string vazia")
-        elif type(data_devolucao) == dict:
-            self.__data_devolucao = {}
-            self.__data_devolucao['dia'] = data_devolucao['dia']
-            self.__data_devolucao['mes'] = data_devolucao['mes']
-            self.__data_devolucao['ano'] = data_devolucao['ano']
-            self.__data_devolucao['hora'] = data_devolucao['hora']
-        else:
-            raise TypeError("A data precisa ser uma string XX/XX/XXXX XX:XX ou um dicionário")
+        self.__data_devolucao = {}
+        self.__data_devolucao = self.formata_data(data_devolucao)
 
     def get_data_devolucao(self) -> dict:
         return self.__data_devolucao
@@ -219,10 +223,44 @@ class Locacao:
     
 #---------------------------------------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------------------------
+
 #Início classe Locações
 class Locacoes:
     __lista: list = []
 
+    @staticmethod
+    def calcula_valor(valor_diaria: float = None, 
+                      valor_seguro: float = 0, 
+                      data_locacao: str | dict = None, 
+                      data_devolucao: str | dict = datetime.now().strftime('%d/%m/%Y %H:%M')) -> float:
+       
+        if valor_diaria < 0:
+            raise ValueError("O valor da diária não pode ser negativo")
+        
+        if valor_seguro < 0:
+            raise ValueError("O valor do seguro não pode ser negativo")
+        
+        if (type(data_locacao) != str and type(data_locacao) != dict) or (type(data_devolucao) != str and type(data_devolucao)!= dict):
+            raise TypeError("As datas precisam ser do tipo string ou dicionário")
+        
+        if type(data_locacao) == dict:
+            data_loc = str(data_locacao['dia'])+'/'+str(data_locacao['mes'])+'/'+str(data_locacao['ano'])+' '+str(data_locacao['hora'])
+        else:
+            data_loc = data_locacao
+        
+        if type(data_devolucao) == dict:
+            data_devol = str(data_devolucao['dia'])+'/'+str(data_devolucao['mes'])+'/'+str(data_devolucao['ano'])+' '+str(data_devolucao['hora'])
+        else:
+            data_devol = data_devolucao
+        data_loc = datetime.strptime(data_loc, '%d/%m/%Y %H:%S')
+        data_devol = datetime.strptime(data_devol, '%d/%m/%Y %H:%S')
+        dias = (data_devol - data_loc).days
+        if dias <= 0:
+            raise ValueError("Não é possível calcular a diaria total para uma locação de menos de 24 horas")
+        lixo = str(data_devol - data_loc).split(" ")
+        horas = int(lixo[2].split(':')[0])
+        return (valor_diaria*dias)+((horas/24)*valor_diaria)+valor_seguro
+    
     def __init__(self, nome_arquivo="Locacoes.csv") -> None:
         try:
             self.__lista = []
@@ -279,7 +317,7 @@ class Locacoes:
             manipulador.writeheader()
             manipulador.writerows(self.__lista)
             arquivo.close()
-        except OSError as err:
+        except OSError:
             raise OSError("Não foi possível abrir o arquivo")
     
     def add_locacao(self, nova_locacao: Locacao) -> None:
@@ -294,6 +332,7 @@ class Locacoes:
         locacao['Seguro'] = nova_locacao.get_seguro()
         locacao['ValorTotal'] = nova_locacao.get_valor_total()
         self.__lista.append(locacao)
+        self.atualiza_arquivo()
     
     def tam(self) -> int:
         return len(self.__lista)
@@ -304,9 +343,26 @@ class Locacoes:
         else:
             tamanho = self.tam()
             return int(self.__lista[tamanho-1]['IdLocacao']) + 1
-
-#Testando a funcionalidade das classes e outros
-teste = Locacoes()
-locaca = Locacao(teste.id_locacoes(), 0, "000.000.000-00", seguro="Sim", valor_total=0, data_devolucao="00/00/00 00:00")
-teste.add_locacao(locaca)
-teste.atualiza_arquivo()
+        
+    def altera_locacao(self, 
+                       id_locacao: int = None, 
+                       data_devolucao: str | dict = datetime.now().strftime('%d/%m/%Y %H:%M'), 
+                       km_final: int = None,
+                       valor_total: float = None) -> None:
+        i = 0
+        while i < self.tam() and int(self.__lista[i]['IdLocacao']) != id_locacao:
+            i += 1
+        if i == self.tam():
+            raise ValueError("Esse Id não existe")
+        if int(km_final) < 0 or km_final < int(self.__lista[i]['KmInicial']):
+            raise ValueError("A Quilometragem não pode ser negativa ou menor do que a quilometragem inicial")
+        if type(data_devolucao) != str and type(data_devolucao) != dict:
+            raise TypeError("A data de devolução pode ser somente do tipo string ou do tipo dicionário")
+        if valor_total < 0:
+            raise ValueError("O valor total não pode ser negativo")
+        nova_data={}
+        nova_data = Locacao.formata_data(data_devolucao)
+        self.__lista[i]['DataDevolucao'] = str(nova_data['dia'])+'/'+str(nova_data['mes'])+'/'+str(nova_data['ano'])+' '+str(nova_data['hora'])
+        self.__lista[i]['KmFinal'] = int(km_final)
+        self.__lista[i]['ValorTotal'] = "{:.2f}".format(float(valor_total))
+        self.atualiza_arquivo()
