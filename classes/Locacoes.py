@@ -344,6 +344,17 @@ class Locacoes:
             tamanho = self.tam()
             return int(self.__lista[tamanho-1]['IdLocacao']) + 1
         
+    def seguro(self, id_locacao: int)->str:
+        if id_locacao < 0:
+            raise ValueError('Id inválido')
+        i = 0
+        while i < self.tam() and int(self.__lista[i]['IdLocacao']) != id_locacao:
+            i += 1
+        if i == self.tam():
+            raise ValueError("Esse Id não existe")
+        else:
+            return str(self.__lista[i]['Seguro'])
+        
     def altera_locacao(self, 
                        id_locacao: int = None, 
                        data_devolucao: str | dict = datetime.now().strftime('%d/%m/%Y %H:%M'), 
