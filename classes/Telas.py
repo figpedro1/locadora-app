@@ -1,13 +1,14 @@
 from classes.Carros import *
 from classes.Clientes import *
+from classes.Locacoes import *
 import os
 
 class Tela:
 
     def __init__(self, caminho_locacoes, caminho_clientes, caminho_carros):
 
-        clientes = Clientes(caminho_clientes)
-        carros = Carros(caminho_carros)
+        self.clientes = Clientes(caminho_clientes)
+        self.carros = Carros(caminho_carros)
 
     @staticmethod
     def limpar_tela():
@@ -114,13 +115,21 @@ class Tela:
 
             match opcao:
                 case 1:
-                    
+                    self.cadastrar_carro()
                 case 2:
-                    
-                case 3:
-                    
-                case 9:
-                    return
+                    self.atualizar_carro()
+                case 5:
+                    self.localiza_carro()
+
+    def nova_locacao():
+
+        locacao = Locacao()
+
+
+
+
+
+    
                 
     def cadastrar_cliente(self):
 
@@ -332,7 +341,7 @@ class Tela:
         while True:
             
 
-            '                       PEDIR AO USUÁRIO O ID DO CARRO                  '
+            carro = self.carros.get_carro(int(input("Digite o ID do carro que deseja alterar informações")))
 
 
 
@@ -358,29 +367,149 @@ class Tela:
             match opcao:
 
                 case 1:
-                    cliente.set_nome(input("Digite o novo nome"))
-                    self.limpar_tela()
+                    try:
+                        carro.set_modelo(self, input("Digite a nova cor do seu carro"))
+                        self.limpar_tela()
+                    except ValueError:
+                        print("Modelo inválido!")
+
                 case 2:
                     try:
-                        cliente.set_idade(input("Digite a nova idade"))
+                        carro.set_cor(self, input("Digite a nova cor do seu carro"))
                         self.limpar_tela()
                         
                     except ValueError:
-                        print("Idade inválida!")
+                        print("Cor inválida!")
 
                 case 3:
-                    cliente.set_endereco(input("Digite o seu novo endereço"))
-                    self.limpar_tela()
+                    try:
+                        carro.set_ano(input("Digite o novo ano do seu carro"))
+                        self.limpar_tela()
+                    except ValueError:
+                            print("Ano inválido!")
+                        
                 case 4:
-                    cliente.set_cidade(input("Digite a nova cidade"))
-                    self.limpar_tela()
+                    try:
+                        carro.set_placa(input("Digite a nova placa do seu carro"))
+                        self.limpar_tela()
+                    except ValueError:
+                        print("Placa inválida!")
+
                 case 5:
-                    cliente.set_estado(input("Digite o novo estado"))
-                    self.limpar_tela()
+                    try:
+                        carro.set_cambio(input("Digite o novo câmbio do seu carro"))
+                        self.limpar_tela()
+                    except ValueError:
+                        print("Câmbio inválido")
+
+                case 6:
+                    try:
+                        carro.set_quilometragem("Digite a nova quilometragem do seu carro")
+                        self.limpar_tela()
+                    except ValueError:
+                        print("Quilometragem inválida!")
+                    
+
+                case 7:
+                    try:
+                        carro.set_diaria("Digite o novo valor de aluguel diário do seu carro")
+                        self.limpar_tela()
+                    except ValueError:
+                        print("Valor inválido!")
+                    
+
+                case 8:
+                    try:
+                        carro.set_quilometragem("Digite a nova quilometragem do seu carro")
+                        self.limpar_tela()
+                    except ValueError:
+                        print("Quilometragem inválida!")
+                    
+
                 case 9:
-                    self.clientes.salvar_csv()
-                    self.limpar_tela()
-                    return        
+                    try:
+                        carro.set_seguro("Digite o novo seguro do seu carro")
+                        self.limpar_tela()
+                    except ValueError:
+                        print("Informação inválida!")
+                    
+                
+                case 9:
+                    try:
+                        carro.set_quilometragem("Digite a nova quilometragem do seu carro")
+                        self.limpar_tela()
+                    except ValueError:
+                        print("Quilometragem inválida!")
+                    
+
+                case 10:
+                    try:
+                        carro.set_disponivel("Tecle [1] para definir seu carro como disponível ou tecle [2] para indisponível")
+                        self.limpar_tela()
+                    except ValueError:
+                        print("Tecla inválida!")
+                    
+
+
+    #                   FUNCIONALIDADE DE EXCLUSÃO DE CARROS                   
+
+
+    #                   FUNCIONALIDADE DE DISPONIBILIZAÇÃO PARA VENDA
+
+
+    def localiza_carro(self):
+
+        self.limpar_tela()
+
+        while(True):
+            
+            try:
+                id = self.carros.get_id_categoria(input("Digite o câmbio do seu carro", input("Digite a categoria do seu carro")))
+                break
+
+            except ValueError:
+                ("Câmbio ou categoria inválidos!")
+
+        opcao = 0
+
+        while(True):
+
+
+            carro = self.carros.get_carro(id[opcao])
+
+            print("Modelo: " + carro.get_modelo())
+            print("Cor: " + carro.get_cor())
+            print("Ano: " + str(carro.get_ano()))
+            print("Placa: " + carro.get_placa())
+            print("Quilometraegem: " + str(carro.get_quilometragem()))
+            print("Diária: " + str(carro.get_diaria()))
+            print("Seguro: " + str(carro.get_seguro()))
+
+            print(("[1] Veículo anterior " if opcao > 0 else "") + ("[2] Próximo veículo " if opcao < self.carros.tam() else "") + "[9] Sair")
+            
+
+            match input("Selecione uma opcao"):
+
+                case "1":
+                    if opcao > 0:
+                        opcao += 1
+                    else:
+                        print("Não há veículo anteriror")
+                case "2":
+                    if opcao < self.carros.tam():
+                        opcao -=1
+                    else:
+                        print("Não há mais carros")
+                case "9":
+                    return
+                case _:
+                    print("Opção inválida!")
+    
+
+    
+
+
+
 
             
         
