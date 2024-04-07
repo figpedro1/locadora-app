@@ -545,13 +545,12 @@ class Carros:
     def zerar_novo_carro(self):
         self.__novo_carro = Carro(vazio=True)
 
-    def add_carro(self):
-        self.get_novo_carro().set_id(self.tam())
-        self.get_novo_carro().__pai = self
-        if not self.get_novo_carro().is_valido():
+    def add_carro(self, novo_carro):
+        novo_carro.set_id(self.tam())
+        novo_carro.pai = self
+        if not novo_carro.is_valido():
             raise ValueError("Declare todos os atributos do novo carro antes de adicioná-lo")
-        self.__lista.append(self.get_novo_carro())
-        self.zerar_novo_carro()
+        self.lista.append(novo_carro)
         self.__salvo = False
 
     def salvar_csv(self):
