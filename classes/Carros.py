@@ -157,7 +157,7 @@ class Carro:
         placa_valida = tamanho_valido and primeira_parte_valida and segunda_parte_valida
         if not placa_valida:
             raise ValueError("Placa inválida")
-        nova_placa = "{}-{}".format(nova_placa[:3], nova_placa[len(nova_placa) - 4:len(nova_placa)].upper())
+        nova_placa = "{}-{}".format(nova_placa[:3].upper(), nova_placa[len(nova_placa) - 4:len(nova_placa)].upper())
         self.__placa = nova_placa
         if self.get_pai() is not None:
             self.get_pai().set_salvo(False)
@@ -293,9 +293,9 @@ class Carro:
                 novo_seguro = self.decimal_para_float(novo_seguro)
 
             if float(novo_seguro) < 0:
-                raise ValueError("Quilometragem inválida")
+                raise ValueError("Seguro inválido")
         except ValueError:
-            raise ValueError("Quilometragem inválida")
+            raise ValueError("Seguro inválido")
 
         self.__seguroPorDia = float(novo_seguro)
         if self.get_pai() is not None:
@@ -316,15 +316,15 @@ class Carro:
         :type novo_disponivel: bool | str
         :return: None
         :rtype: None
-        :raises TypeError: Caso novo_disponivel seja inválido
+        :raises ValueError: Caso novo_disponivel seja inválido
         """
+        if type(novo_disponivel) is not bool and str(novo_disponivel).upper() not in ("SIM", "NÃO", "NAO", "TRUE", "FALSE"):
+            raise ValueError("Valor inválido para disponivel")
         try:
             if type(novo_disponivel) is str:
-                novo_disponivel = True if (novo_disponivel.upper() == "TRUE" or
-                                           novo_disponivel.upper() == "SIM") else False
-            novo_disponivel = bool(novo_disponivel)
+                novo_disponivel = novo_disponivel.upper() == "TRUE" or novo_disponivel.upper() == "SIM"
         except ValueError:
-            raise TypeError("Valor inválido para disponível")
+            raise ValueError("Valor inválido para disponível")
 
         self.__disponivel = novo_disponivel
         if self.get_pai() is not None:
@@ -550,7 +550,7 @@ class Carros:
         novo_carro.pai = self
         if not novo_carro.is_valido():
             raise ValueError("Declare todos os atributos do novo carro antes de adicioná-lo")
-        self.lista.append(novo_carro)
+        self.__lista.append(novo_carro)
         self.__salvo = False
 
     def salvar_csv(self):

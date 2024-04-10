@@ -1,6 +1,7 @@
-from Clientes import *
+from classes.Clientes import *
 import csv
 from datetime import *
+
 
 class Locacao:
     """
@@ -37,49 +38,47 @@ class Locacao:
     __data_devolucao: dict | str | None = "00/00/00 00:00"
     __km_inicial: int | None = 0
     __km_final: int | None = 0
-    __seguro: str | None = None
+    __seguro: bool | None = None
     __valor_total: float = 0
 
     @staticmethod
     def formata_data(data: str | dict) -> dict:
         """
-        Transforma uma string em um dicionário com os campos 'dia', 'mês', 'ano', 'hora' ou atribui um dicionário com esses campos a um novo dicionário.
+        Transforma uma string em um dicionário com os campos 'dia', 'mês', 'ano', 'hora' ou atribui um dicionário com
+        esses campos a um novo dicionário.
 
-        :param data: Uma data qualquer no formata XX/XX/XXXX XX:XX
+        :param data: Uma data qualquer no formato XX/XX/XXXX XX:XX
         :type data: str | dict
         :return: Retorna a data no formato de um dicionário com os campos 'dia', 'mês', 'ano', 'hora'
         :rtype: dict
+        :raises ValueError: Quando a string não é válida
         """
-        if type(data) != str and type(data) != dict:
-            raise TypeError("A data pode ser somente uma string ou um dicionário")
-        if type(data) == str:
-            if data == "":
-                raise ValueError("A data não pode ser uma string vazia")
-            else:
-                nova_data = {}
-                nova_data['dia'] = data.split('/')[0]
-                nova_data['mes'] = data.split('/')[1]
-                ano = str(data.split(' ')[0])
-                nova_data['ano'] = ano.split('/')[2]
-                nova_data['hora'] = data.split(' ')[1]
-                return nova_data
-        else:
-            nova_data = {}
-            nova_data['dia'] = data['dia']
-            nova_data['mes'] = data['mes']
-            nova_data['ano'] = data['ano']
-            nova_data['hora'] = data['hora']
-            return nova_data
+        print(type(data))
+        if type(data) is dict:
+            return data
+        if type(data) is not str:
+            raise TypeError("Data deve ser uma string ou um dicionário")
+
+        data_dict = datetime.strptime(data, '%d/%m/%Y %H:%M')
+
+        data = {
+            'dia': str(data_dict.day),
+            'mes': str(data_dict.month),
+            'ano': str(data_dict.year),
+            'hora': (str(data_dict.hour) + str(data_dict.minute))
+        }
+
+        return data
 
     def __init__(self, 
                  id_locacao: int = 0,
                  id_carro: int = None,
-                 cpf_cliente: str | None =None,      
+                 cpf_cliente: str | None = None,
                  data_locacao: str = datetime.now().strftime('%d/%m/%Y %H:%M'),
                  data_devolucao: str = "00/00/00 00:00",
                  km_inicial: int = 0,
                  km_final: int = 0,
-                 seguro: str = None,
+                 seguro: bool = None,
                  valor_total: float = 0,
                  vazio: bool = False
                  ) -> None:
@@ -117,8 +116,7 @@ class Locacao:
             self.set_seguro(seguro)
             self.set_valor_total(valor_total)
 
-
-    #Set e Get do id da Locação
+    # Set e Get do id da Locação
     def set_id_locacao(self, novo_id) -> None:
         """
         Atribui um novo valor de ID da locação. 
@@ -140,7 +138,7 @@ class Locacao:
         """
         return self.__id_locacao
 
-    #Set e Get do id do carro
+    # Set e Get do id do carro
     def set_id_carro(self, id_carro: int) -> None:
         """
         Atribui um novo ID do carro locado.
@@ -157,30 +155,28 @@ class Locacao:
     def get_id_carro(self) -> int:
         return self.__id_carro
 
-    #Set e Get do CPF do cliente
-    def set_cpf_cliente(self, novoCpf: str) -> None:
+    # Set e Get do CPF do cliente
+    def set_cpf_cliente(self, novo_cpf: str) -> None:
         """
         Atribui o CPF do cliente na classe Locações
         """
-        self.__cpf_cliente = Cliente.formatar_cpf(novoCpf)
+        self.__cpf_cliente = Cliente.formatar_cpf(novo_cpf)
 
     def get_cpf_cliente(self) -> str:
         return self.__cpf_cliente
     
     def set_data_locacao(self, data_locacao: dict | str) -> None:
-        self.__data_locacao = {}
-        self.__data_locacao = self.formata_data(data_locacao)
+        self.__data_locacao = data_locacao
         
     def get_data_locacao(self) -> dict:
         return self.__data_locacao
     
     def set_data_devolucao(self, data_devolucao: dict | str) -> None:
         self.__data_devolucao = {}
-        self.__data_devolucao = self.formata_data(data_devolucao)
+        self.__data_devolucao = data_devolucao
 
     def get_data_devolucao(self) -> dict:
         return self.__data_devolucao
-
 
     def set_km_inicial(self, km_inicial: int) -> None:
         km_inicial = int(km_inicial)
@@ -195,21 +191,18 @@ class Locacao:
         km_final = int(km_final)
         if km_final < 0:
             raise ValueError("A quilometragem não pode ser inferior a 0")
-        if km_final < self.__km_inicial:
-            raise ValueError("A quilometragem final não pode ser inferior a quilometragem inicial")
         self.__km_final = km_final
 
     def get_km_final(self) -> int:
         return self.__km_final
     
-    def set_seguro(self, seguro: str) -> None:
-        if seguro.upper() not in ("SIM", "NÃO", "NAO"):
-            raise ValueError("O seguro precisa ser sim ou não")
-        if seguro.upper() == "NAO":
-            seguro = "Não"
-        self.__seguro = seguro.capitalize()
+    def set_seguro(self, seguro: str | bool) -> None:
+        seguro = str(seguro)
+        if seguro.upper() not in ("SIM", "NÃO", "NAO", "TRUE", "FALSE"):
+            raise ValueError("Os valores válidos para seguro são 'Sim' e 'Não'")
+        self.__seguro = seguro.upper() == "SIM" or seguro.upper() == "TRUE"
 
-    def get_seguro(self) -> str:
+    def get_seguro(self) -> bool:
         return self.__seguro
     
     def set_valor_total(self, valor_total: float) -> None:
@@ -220,13 +213,25 @@ class Locacao:
     
     def get_valor_total(self) -> float:
         return self.__valor_total
-    
-#---------------------------------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------------------------------
 
-#Início classe Locações
+    def get_linha(self) -> tuple:
+        return (
+            str(self.get_id_locacao()),
+            str(self.get_id_carro()),
+            str(self.get_cpf_cliente()),
+            str(self.get_data_locacao()),
+            str(self.get_data_devolucao()),
+            str(self.get_km_inicial()),
+            str(self.get_km_final()),
+            "Sim" if str(self.get_seguro()) else "Não",
+            str(self.get_valor_total()),
+        )
+
+
+# Início classe Locações
 class Locacoes:
     __lista: list = []
+    __caminho_arquivo: str
 
     @staticmethod
     def calcula_valor(valor_diaria: float = None, 
@@ -240,16 +245,25 @@ class Locacoes:
         if valor_seguro < 0:
             raise ValueError("O valor do seguro não pode ser negativo")
         
-        if (type(data_locacao) != str and type(data_locacao) != dict) or (type(data_devolucao) != str and type(data_devolucao)!= dict):
+        if (
+            (type(data_locacao) is not str and type(data_locacao) is not dict) or
+            (type(data_devolucao) is not str and type(data_devolucao) is not dict)
+        ):
             raise TypeError("As datas precisam ser do tipo string ou dicionário")
         
-        if type(data_locacao) == dict:
-            data_loc = str(data_locacao['dia'])+'/'+str(data_locacao['mes'])+'/'+str(data_locacao['ano'])+' '+str(data_locacao['hora'])
+        if type(data_locacao) is dict:
+            data_loc = (
+                    str(data_locacao['dia']) + '/' +
+                    str(data_locacao['mes']) + '/' +
+                    str(data_locacao['ano']) + ' ' +
+                    str(data_locacao['hora'])
+            )
         else:
             data_loc = data_locacao
         
-        if type(data_devolucao) == dict:
-            data_devol = str(data_devolucao['dia'])+'/'+str(data_devolucao['mes'])+'/'+str(data_devolucao['ano'])+' '+str(data_devolucao['hora'])
+        if type(data_devolucao) is dict:
+            data_devol = (str(data_devolucao['dia'])+'/'+str(data_devolucao['mes'])+'/'+str(data_devolucao['ano']) +
+                          ' '+str(data_devolucao['hora']))
         else:
             data_devol = data_devolucao
         data_loc = datetime.strptime(data_loc, '%d/%m/%Y %H:%S')
@@ -260,91 +274,74 @@ class Locacoes:
         lixo = str(data_devol - data_loc).split(" ")
         horas = int(lixo[2].split(':')[0])
         return (valor_diaria*dias)+((horas/24)*valor_diaria)+valor_seguro
-    
-    def __init__(self, nome_arquivo="Locacoes.csv") -> None:
+
+    def __init__(self, caminho_arquivo="planilhas/Locacoes.csv") -> None:
+        self.__lista = []
         try:
-            self.__lista = []
-            arquivo_locacoes = open(nome_arquivo, "r", newline="")
-            campos = csv.DictReader(arquivo_locacoes, delimiter=';')
-            for linhas in campos:
-                locacoes = {}
-                locacoes['IdLocacao'] = linhas['IdLocacao']
-                locacoes['IdCarro'] = linhas['IdCarro']
-                locacoes['CPF'] = linhas['CPF']
-                locacoes['DataLocacao'] = linhas['DataLocacao']
-                locacoes['DataDevolucao'] = linhas['DataDevolucao']
-                locacoes['KmInicial'] = linhas['KmInicial']
-                locacoes['KmFinal'] = linhas['KmFinal']
-                locacoes['Seguro'] = linhas['Seguro']
-                locacoes['ValorTotal'] = linhas['ValorTotal']
-                self.__lista.append(locacoes)
-            arquivo_locacoes.close()
+            with open(caminho_arquivo, "r", newline="") as arquivo_locacoes:
+                arquivo_csv = csv.reader(arquivo_locacoes, delimiter=';')
+                next(arquivo_csv, None)
+
+                for linhas in arquivo_csv:
+                    print(linhas[3] + linhas[4])
+                    locacao = Locacao(
+                        int(linhas[0]),
+                        int(linhas[1]),
+                        linhas[2],
+                        linhas[3],
+                        linhas[4],
+                        int(linhas[5]),
+                        int(linhas[6]),
+                        linhas[7].upper() == "SIM",
+                        float(linhas[8])
+                    )
+
+                    self.__lista.append(locacao)
         except FileNotFoundError:
-            arquivo_locacoes = open(nome_arquivo, "a", newline="")
-            campos = csv.writer(arquivo_locacoes, delimiter=';')
-            campos.writerow((
-                "IdLocacao",
-                "IdCarro",
-                "CPF",
-                "DataLocacao",
-                "DataDevolucao",
-                "KmInicial",
-                "KmFinal",
-                "Seguro",
-                "ValorTotal"
+            with open(caminho_arquivo, "w", newline="") as arquivo_locacoes:
+                escritor = csv.writer(arquivo_locacoes, delimiter=';')
+                escritor.writerow((
+                    "Id da locacao",
+                    "Id do carro",
+                    "CPF do cliente",
+                    "Data de locação",
+                    "Data de devolução",
+                    "Quilometragem inicial",
+                    "Quilometragem final",
+                    "Optou por seguro",
+                    "Valor total"
+                ))
+        self.__caminho_arquivo = caminho_arquivo
+
+    def get_locacao(self, id_locacao: int) -> Locacao:
+        return self.__lista[id_locacao]
+
+    def salvar_csv(self):
+        with open(self.__caminho_arquivo, 'w', newline="") as arquivo_locacoes:
+            escritor = csv.writer(arquivo_locacoes, delimiter=';')
+            escritor.writerow((
+                "Id da locacao",
+                "Id do carro",
+                "CPF do cliente",
+                "Data de locação",
+                "Data de devolução",
+                "Quilometragem inicial",
+                "Quilometragem final",
+                "Optou por seguro",
+                "Valor total"
             ))
-            arquivo_locacoes.close()
+            for linha in self.__lista:
+                escritor.writerow(linha.get_linha())
 
-    def get_lista(self) -> dict:
-        return self.__lista
-    
-
-    def atualiza_arquivo(self) -> None:   
-        nome_arquivo = "Locacoes.csv"
-        try:
-            arquivo = open(nome_arquivo, "w", newline="")
-            campos = ["IdLocacao",
-                "IdCarro",
-                "CPF",
-                "DataLocacao",
-                "DataDevolucao",
-                "KmInicial",
-                "KmFinal",
-                "Seguro",
-                "ValorTotal"
-            ]
-            manipulador = csv.DictWriter(arquivo, fieldnames=campos, delimiter=';')
-            manipulador.writeheader()
-            manipulador.writerows(self.__lista)
-            arquivo.close()
-        except OSError:
-            raise OSError("Não foi possível abrir o arquivo")
-    
     def add_locacao(self, nova_locacao: Locacao) -> None:
-        locacao = {}
-        locacao['IdLocacao'] = nova_locacao.get_id_locacao()
-        locacao['IdCarro'] = nova_locacao.get_id_carro()
-        locacao['CPF'] = nova_locacao.get_cpf_cliente()
-        locacao['DataLocacao'] = str(nova_locacao.get_data_locacao()['dia'])+'/'+str(nova_locacao.get_data_locacao()['mes'])+'/'+str(nova_locacao.get_data_locacao()['ano'])+' '+str(nova_locacao.get_data_locacao()['hora']) 
-        locacao['DataDevolucao'] = str(nova_locacao.get_data_devolucao()['dia'])+'/'+str(nova_locacao.get_data_devolucao()['mes'])+'/'+str(nova_locacao.get_data_devolucao()['ano'])+' '+str(nova_locacao.get_data_devolucao()['hora']) 
-        locacao['KmInicial'] = nova_locacao.get_km_inicial()
-        locacao['KmFinal'] = nova_locacao.get_km_final()
-        locacao['Seguro'] = nova_locacao.get_seguro()
-        locacao['ValorTotal'] = nova_locacao.get_valor_total()
-        self.__lista.append(locacao)
-        self.atualiza_arquivo()
-    
+        nova_locacao.set_id_carro(len(self.__lista))
+        self.__lista.append(nova_locacao)
+        self.salvar_csv()
+
     def tam(self) -> int:
         return len(self.__lista)
-    
-    def id_locacoes(self)->int:
-        if self.__lista == []:
-            return 0
-        else:
-            tamanho = self.tam()
-            return int(self.__lista[tamanho-1]['IdLocacao']) + 1
         
-    def seguro(self, id_locacao: int)->str:
+    def seguro(self, id_locacao: int) -> str:
         if id_locacao < 0:
             raise ValueError('Id inválido')
         i = 0
@@ -354,26 +351,6 @@ class Locacoes:
             raise ValueError("Esse Id não existe")
         else:
             return str(self.__lista[i]['Seguro'])
-        
-    def altera_locacao(self, 
-                       id_locacao: int = None, 
-                       data_devolucao: str | dict = datetime.now().strftime('%d/%m/%Y %H:%M'), 
-                       km_final: int = None,
-                       valor_total: float = None) -> None:
-        i = 0
-        while i < self.tam() and int(self.__lista[i]['IdLocacao']) != id_locacao:
-            i += 1
-        if i == self.tam():
-            raise ValueError("Esse Id não existe")
-        if int(km_final) < 0 or km_final < int(self.__lista[i]['KmInicial']):
-            raise ValueError("A Quilometragem não pode ser negativa ou menor do que a quilometragem inicial")
-        if type(data_devolucao) != str and type(data_devolucao) != dict:
-            raise TypeError("A data de devolução pode ser somente do tipo string ou do tipo dicionário")
-        if valor_total < 0:
-            raise ValueError("O valor total não pode ser negativo")
-        nova_data={}
-        nova_data = Locacao.formata_data(data_devolucao)
-        self.__lista[i]['DataDevolucao'] = str(nova_data['dia'])+'/'+str(nova_data['mes'])+'/'+str(nova_data['ano'])+' '+str(nova_data['hora'])
-        self.__lista[i]['KmFinal'] = int(km_final)
-        self.__lista[i]['ValorTotal'] = "{:.2f}".format(float(valor_total))
-        self.atualiza_arquivo()
+
+    def get_lista(self) -> list:
+        return self.__lista

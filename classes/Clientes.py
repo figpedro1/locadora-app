@@ -394,19 +394,27 @@ class Clientes:
         self.__lista[novo_cliente.get_cpf()] = novo_cliente
         self.__salvo = False
 
-    def get_cliente(self, cpf: str) -> Cliente:
+    def get_cliente(self, cpf: str | None = None, nome: str | None = None) -> Cliente:
         """
         Retorna a referência para um objeto Cliente.
         Pode ser usado tanto para ler quanto para modificar o objeto cliente
         :param cpf: CPF do cliente que deseja, formatado ou não
         :type cpf: str
+        :param nome: Nome do cliente que deseja encontrar
         :return: Cliente com CPF correspondente
         :rtype: Cliente
         """
-        cpf = Cliente.formatar_cpf(cpf)
+        try:
+            cpf = Cliente.formatar_cpf(cpf)
+        except ValueError:
+            pass
         if cpf not in self.__lista:
-            raise Exception("Cliente não cadastrado")
+            for cliente in self.__lista.values():
+                if cliente.get_nome().upper() == nome.upper():
+                    return cliente
+            raise IndexError("Cliente não cadastrado")
         return self.__lista[cpf]
+
 
     def set_salvo(self, salvo: bool):
         if type(salvo) is not bool:
