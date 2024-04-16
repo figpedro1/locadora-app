@@ -53,7 +53,6 @@ class Locacao:
         :rtype: dict
         :raises ValueError: Quando a string não é válida
         """
-        print(type(data))
         if type(data) is dict:
             return data
         if type(data) is not str:
@@ -172,7 +171,6 @@ class Locacao:
         return self.__data_locacao
     
     def set_data_devolucao(self, data_devolucao: dict | str) -> None:
-        self.__data_devolucao = {}
         self.__data_devolucao = data_devolucao
 
     def get_data_devolucao(self) -> dict:
@@ -283,7 +281,6 @@ class Locacoes:
                 next(arquivo_csv, None)
 
                 for linhas in arquivo_csv:
-                    print(linhas[3] + linhas[4])
                     locacao = Locacao(
                         int(linhas[0]),
                         int(linhas[1]),

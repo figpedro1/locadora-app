@@ -16,17 +16,22 @@ class Telas:
     def limpar_tela():
         os.system(limpar_tela)
 
+    @staticmethod
+    def separador():
+        print("=" * 80)
+
     def tela_inicial(self):
 
         while True:
             self.limpar_tela()
-
+            self.separador()
             print(
-                f"[1] Locações\n" +
+                f"\n[1] Locações\n" +
                 "[2] Clientes\n" +
                 "[3] Carros\n" +
-                "[9] Sair\n\n\n"
+                "[9] Sair\n"
             )
+            self.separador()
 
             match input("Digite a opção desejada: "):
                 case "1":
@@ -43,13 +48,14 @@ class Telas:
     def tela_locacoes(self):
         while True: 
             self.limpar_tela()
-
+            self.separador()
             print(
-                f"[1] Nova locação\n" +
+                f"\n[1] Nova locação\n" +
                 "[2] Finalizar Locação\n" +
                 "[3] Relatório de carros locados\n" +
-                "[9] Sair\n\n\n"
+                "[9] Voltar\n"
             )
+            self.separador()
 
             match input("Digite a opção desejada: "):
                 case "1":
@@ -68,10 +74,10 @@ class Telas:
             self.limpar_tela()
             
             print(
-                f"[1] Cadastrar novo\n" +
+                f"\n[1] Cadastrar novo\n" +
                 "[2] Atualizar informações\n" +
                 "[3] Localizar locações\n" +
-                "[9] Sair\n\n\n"
+                "[9] Voltar\n"
             )
 
             match input("Digite a opção desejada: "):
@@ -91,22 +97,24 @@ class Telas:
         while True:
 
             self.limpar_tela()
-
+            self.separador()
             print(
-                f"[1] Cadastrar novo\n" +
+                f"\n[1] Cadastrar novo\n" +
                 "[2] Atualizar informações\n" +
-                "[3] Excluir um carro\n" +
-                "[4] Disponibilizar carros para venda\n" +
-                "[5] Localizar carros por categoria\n" +
+                "[3] Disponibilizar carros para venda\n" +
+                "[4] Localizar carros por categoria\n" +
                 "[9] Sair\n"
             )
+            self.separador()
 
             match input("Digite a opção desejada: "):
                 case "1":
                     self.cadastrar_carro()
                 case "2":
                     self.atualizar_carro()
-                case "5":
+                case "3":
+                    self.disponibilizar_carros_para_venda()
+                case "4":
                     self.localiza_carro()
                 case "9":
                     return
@@ -317,7 +325,7 @@ class Telas:
                 f"{carro.get_placa()[:tamanhos[5]]:<{tamanhos[5]}}|" +
                 f"{valor_atual[:tamanhos[6]]:<{tamanhos[6]}}|"
             )
-            input()
+        input()
 
     def cadastrar_cliente(self):
         novo_cliente = Cliente(vazio=True)
@@ -357,7 +365,7 @@ class Telas:
         self.clientes.add_cliente(novo_cliente)
         self.clientes.salvar_csv()
         print("Cliente cadastrado com sucesso!")
-        input("Aprente [ENTER] para continuar")
+        input("Aperte [ENTER] para continuar")
         return
 
     def atualizar_cliente(self):
@@ -379,7 +387,7 @@ class Telas:
 
         except IndexError:
             print("Cliente não cadastrado!")
-            input("Aprente [ENTER] para continuar")
+            input("Aperte [ENTER] para continuar")
             return
         
         self.limpar_tela()
@@ -391,18 +399,19 @@ class Telas:
                 "[3] Endereço\n" +
                 "[4] Cidade\n" +
                 "[5] Estado\n" +
+                "[6] Fechar conta\n" +
                 "[9] Salvar e sair\n"
             )
 
-            opcao = int(input("Selecione o dado que deseja alterar: "))    
+            opcao = input("Selecione o dado que deseja alterar: ")
             self.limpar_tela()
 
             match opcao:
 
-                case 1:
+                case "1":
                     cliente.set_nome(input("Digite o novo nome"))
                     self.limpar_tela()
-                case 2:
+                case "2":
                     try:
                         cliente.set_idade(int(input("Digite a nova idade")))
                         self.limpar_tela()
@@ -410,41 +419,75 @@ class Telas:
                     except ValueError:
                         print("Idade inválida!")
 
-                case 3:
+                case "3":
                     cliente.set_endereco(input("Digite o seu novo endereço"))
                     self.limpar_tela()
-                case 4:
+                case "4":
                     cliente.set_cidade(input("Digite a nova cidade"))
                     self.limpar_tela()
-                case 5:
+                case "5":
                     cliente.set_estado(input("Digite o novo estado"))
                     self.limpar_tela()
-                case 9:
+                case "6":
+                    self.clientes.apagar_cliente(cliente)
+                    self.clientes.salvar_csv()
+                    print("Conta fechada com sucesso!")
+                    input("Aperte [ENTER] para continuar")
+                    self.limpar_tela()
+                    return
+                case "9":
                     self.clientes.salvar_csv()
                     self.limpar_tela()
                     return
 
+                case _:
+                    print("Opcao invalida!")
+                    input("Aperte [ENTER] para continuar")
+                    self.limpar_tela()
+
     def localizar_locacoes(self):
         self.limpar_tela()
-        while True:
-            identificacao = input("Digite o nome completo ou CPF do cliente que deseja localizar as locações: ")
-            try:
-                Cliente.formatar_cpf(identificacao)
-            except ValueError:
-                print("CPF")
-            try:
-                cliente = self.clientes.get_cliente(identificacao, identificacao)
-            except IndexError:
-                self.limpar_tela()
-                input("Cliente não cadastrado. Aperte [ENTER] para continuar")
+        identificacao = input("Digite o nome completo ou CPF do cliente que deseja localizar as locações: ")
+        try:
+            cliente = self.clientes.get_cliente(identificacao, identificacao)
+        except IndexError:
+            self.limpar_tela()
+            input("Cliente não cadastrado. Aperte [ENTER] para continuar")
+            return
 
+        locacoes = []
+        for locacao in self.locacoes.get_lista():
+            if locacao.get_cpf_cliente() == cliente.get_cpf():
+                locacoes.append(locacao)
 
+        if len(locacoes) == 0:
+            self.limpar_tela()
+            print("Nenhuma locação encontrada")
+            input("Aperte [ENTER] para continuar")
+            return
 
+        self.limpar_tela()
+        print(
+            f"{"Placa do carro":<16}"
+            f"{"Data da locação":<17}"
+            f"{"Data da devolução":<23}"
+            f"{"Kilometragem percorrida":<25}"
+            f"{"Valor total":<23}"
+        )
 
+        for locacao in locacoes:
+            km_percorrido = int(locacao.get_km_final()) - int(locacao.get_km_inicial())
+            print(
+                f"{self.carros.get_carro(locacao.get_id_carro()).get_placa():<16}"
+                f"{locacao.get_data_locacao():<17}"
+                f"{locacao.get_data_devolucao() if locacao.get_data_devolucao() != "00/00/00 00:00" 
+                    else "Locação ainda ativa":<23}"
+                f"{km_percorrido if km_percorrido >= 0 else "Locação ainda ativa":<25}"
+                f"{locacao.get_valor_total() if int(locacao.get_valor_total()) else "Locação ainda ativa":<23}"
+            )
 
-
-
-
+        input("Aperte [ENTER] para continuar")
+        return
 
     def cadastrar_carro(self):
 
@@ -545,7 +588,13 @@ class Telas:
     def atualizar_carro(self):
 
         self.limpar_tela()
-        carro = self.carros.get_carro(int(input("Digite o ID do carro que deseja alterar informações: ")))
+        try:
+            carro = self.carros.get_carro(int(input("Digite o ID do carro que deseja alterar informações: ")))
+        except IndexError:
+            print("Carro inexistente!")
+            input("Aperte [ENTER] para continuar")
+            return
+
         while True:
             self.limpar_tela()
             print(
@@ -559,6 +608,7 @@ class Telas:
                 "[8] Aluguel\n" +
                 "[9] Seguro\n" +
                 "[10] Disponibilidade\n" +
+                "[11] Excluir carro\n" +
                 "[0] Salvar e sair\n"
             )
 
@@ -633,6 +683,17 @@ class Telas:
                     except ValueError:
                         input("Disponibilidade inválida! Aperte [ENTER] para continuar")
 
+                case "11":
+                    self.limpar_tela()
+                    print("A exclusão é permanente, não é possível recuperar dados apagados")
+                    opcao = input("Tem certeza que deseja excluir " + carro.get_modelo() + "? [S] ou [N]")
+                    if opcao.upper() == "S":
+                        self.carros.excluir_carro(carro)
+                        self.carros.salvar_csv()
+                        print("Carro excluido com sucesso!")
+                        input("Aperte [ENTER] para continuar")
+                        return
+
                 case "0":
                     self.carros.salvar_csv()
                     return
@@ -640,6 +701,37 @@ class Telas:
                 case _:
                     self.limpar_tela()
                     input("Opção inválida. Aperte [ENTER] para continuar")
+
+    def disponibilizar_carros_para_venda(self):
+        carros_para_venda = self.carros.disponibilizar_para_venda()
+        try:
+            with open("planilhas/Vendas.csv", "r", newline=""):
+                pass
+        except FileNotFoundError:
+            with open("planilhas/Vendas.csv", "w", newline="") as arquivo_csv:
+                escritor = csv.writer(arquivo_csv, delimiter=";")
+                escritor.writerow((
+                    "Identificação do Carro",
+                    "Modelo",
+                    "Cor",
+                    "Ano de fabricação",
+                    "Placa",
+                    "Câmbio",
+                    "Categoria",
+                    "Quilometragem",
+                    "Valor da diária",
+                    "Valor do seguro por dia",
+                    "Disponível"
+                ))
+
+        with open("planilhas/Vendas.csv", "a", newline="") as arquivo_csv:
+            escritor = csv.writer(arquivo_csv, delimiter=";")
+            for carro in carros_para_venda:
+                escritor.writerow(carro.get_linha())
+
+        print("Carros antigos ou rodados colocados a venda!\n"
+              f"Foram colocados a venda {str(len(carros_para_venda))} carros\n")
+        input("Aperte [ENTER] para continuar")
 
     def localiza_carro(self):
 

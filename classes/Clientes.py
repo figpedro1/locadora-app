@@ -72,7 +72,6 @@ class Cliente:
         """
         cpf = str(cpf).replace(".", "").replace("-", "")
         if len(cpf) != 11 or (not cpf.isnumeric()):
-            print("pipipipopopo")
             raise ValueError("CPF inválido")
         if not cpf.isnumeric():
             raise ValueError("CPF inválido")
@@ -357,6 +356,9 @@ class Clientes:
 
         self.__salvo = True
 
+    def tam(self):
+        return len(self.__lista)
+
     def salvar_csv(self) -> None:
         """
         Salva o arquivo CSV caso o mesmo tenha sido modificado.
@@ -408,13 +410,13 @@ class Clientes:
             cpf = Cliente.formatar_cpf(cpf)
         except ValueError:
             pass
-        if cpf not in self.__lista:
-            for cliente in self.__lista.values():
-                if cliente.get_nome().upper() == nome.upper():
-                    return cliente
+        if cpf not in self.__lista.keys():
+            if type(nome) is str:
+                for cliente in self.__lista.values():
+                    if cliente.get_nome().upper() == nome.upper():
+                        return cliente
             raise IndexError("Cliente não cadastrado")
         return self.__lista[cpf]
-
 
     def set_salvo(self, salvo: bool):
         if type(salvo) is not bool:
@@ -428,3 +430,6 @@ class Clientes:
         :rtype: bool
         """
         return self.__salvo
+
+    def apagar_cliente(self, cliente):
+        del self.__lista[cliente.get_cpf()]

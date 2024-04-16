@@ -318,7 +318,8 @@ class Carro:
         :rtype: None
         :raises ValueError: Caso novo_disponivel seja inválido
         """
-        if type(novo_disponivel) is not bool and str(novo_disponivel).upper() not in ("SIM", "NÃO", "NAO", "TRUE", "FALSE"):
+        if (type(novo_disponivel) is not bool and str(novo_disponivel).upper() not in
+                ("SIM", "NÃO", "NAO", "TRUE", "FALSE")):
             raise ValueError("Valor inválido para disponivel")
         try:
             if type(novo_disponivel) is str:
@@ -470,7 +471,7 @@ class Carros:
 
         __novo_carro: Carro = Instância de carro vazio, para ser preenchido e adicionado ao CSV
     """
-    __lista: list[Carro] = []
+    __lista = {}
     __salvo: bool = False
     __caminho_para_arquivo: str = None
     __novo_carro: Carro = Carro(vazio=True)
@@ -491,21 +492,19 @@ class Carros:
                 next(arquivo_csv, None)
 
                 for linha in arquivo_csv:
-                    self.__lista.append(
-                        Carro(
-                            int(linha[0]),
-                            linha[1],
-                            linha[2],
-                            int(linha[3]),
-                            linha[4],
-                            linha[5],
-                            linha[6],
-                            int(linha[7]),
-                            float(linha[8]),
-                            float(linha[9]),
-                            bool(linha[10] == "Sim"),
-                            self
-                        )
+                    self.__lista[int(linha[0])] = Carro(
+                        int(linha[0]),
+                        linha[1],
+                        linha[2],
+                        int(linha[3]),
+                        linha[4],
+                        linha[5],
+                        linha[6],
+                        int(linha[7]),
+                        float(linha[8]),
+                        float(linha[9]),
+                        bool(linha[10] == "Sim"),
+                        self
                     )
                     if linha[5] not in self.__id_por_classificacao:
                         self.__id_por_classificacao[linha[5]] = {}
@@ -546,11 +545,14 @@ class Carros:
         self.__novo_carro = Carro(vazio=True)
 
     def add_carro(self, novo_carro):
-        novo_carro.set_id(self.tam())
+        if len(self.__lista) > 0:
+            novo_carro.set_id(list(self.__lista.keys())[-1] + 1)
+        else:
+            novo_carro.set_id(0)
         novo_carro.pai = self
         if not novo_carro.is_valido():
             raise ValueError("Declare todos os atributos do novo carro antes de adicioná-lo")
-        self.__lista.append(novo_carro)
+        self.__lista[novo_carro.get_id()] = novo_carro
         self.__salvo = False
 
     def salvar_csv(self):
@@ -575,7 +577,7 @@ class Carros:
                 )
             )
 
-            for item in self.__lista:
+            for item in self.__lista.values():
                 escritor.writerow(item.get_linha())
             self.__salvo = True
 
@@ -613,3 +615,18 @@ class Carros:
     
     def is_salvo(self):
         return self.__salvo
+
+    def excluir_carro(self, carro):
+        del self.__lista[carro.get_id()]
+        self.__salvo = False
+
+    def disponibilizar_para_venda(self):
+        ano_atual = datetime.datetime.now().year
+        carros_para_venda = []
+        for carro in list(self.__lista.values()):
+            if (ano_atual - carro.get_ano() >= 3) or (carro.get_quilometragem() > 60000):
+                carros_para_venda.append(carro)
+                self.excluir_carro(carro)
+
+        self.salvar_csv()
+        return carros_para_venda
