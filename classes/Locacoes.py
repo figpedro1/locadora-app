@@ -331,7 +331,7 @@ class Locacoes:
                 escritor.writerow(linha.get_linha())
 
     def add_locacao(self, nova_locacao: Locacao) -> None:
-        nova_locacao.set_id_carro(len(self.__lista))
+        nova_locacao.set_id_locacao(len(self.__lista))
         self.__lista.append(nova_locacao)
         self.salvar_csv()
 
