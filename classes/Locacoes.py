@@ -268,8 +268,11 @@ class Locacoes:
         data_devol = datetime.strptime(data_devol, '%d/%m/%Y %H:%S')
         dias = (data_devol - data_loc).days
         lixo = str(data_devol - data_loc).split(" ")
-        horas = int(lixo[2].split(':')[0])
-        return (valor_diaria*dias)+((horas/24)*valor_diaria)+valor_seguro
+        if len(lixo) == 1:
+            return valor_diaria+valor_seguro
+        else:
+            horas = int(lixo[2].split(':')[0])
+            return (valor_diaria*dias)+((horas/24)*valor_diaria)+valor_seguro
 
     def __init__(self, caminho_arquivo="planilhas/Locacoes.csv") -> None:
         self.__lista = []
