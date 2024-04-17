@@ -53,7 +53,6 @@ class Locacao:
         :rtype: dict
         :raises ValueError: Quando a string não é válida
         """
-        print(type(data))
         if type(data) is dict:
             return data
         if type(data) is not str:
@@ -172,7 +171,6 @@ class Locacao:
         return self.__data_locacao
     
     def set_data_devolucao(self, data_devolucao: dict | str) -> None:
-        self.__data_devolucao = {}
         self.__data_devolucao = data_devolucao
 
     def get_data_devolucao(self) -> dict:
@@ -269,8 +267,6 @@ class Locacoes:
         data_loc = datetime.strptime(data_loc, '%d/%m/%Y %H:%S')
         data_devol = datetime.strptime(data_devol, '%d/%m/%Y %H:%S')
         dias = (data_devol - data_loc).days
-        if dias <= 0:
-            raise ValueError("Não é possível calcular a diaria total para uma locação de menos de 24 horas")
         lixo = str(data_devol - data_loc).split(" ")
         horas = int(lixo[2].split(':')[0])
         return (valor_diaria*dias)+((horas/24)*valor_diaria)+valor_seguro
@@ -283,7 +279,6 @@ class Locacoes:
                 next(arquivo_csv, None)
 
                 for linhas in arquivo_csv:
-                    print(linhas[3] + linhas[4])
                     locacao = Locacao(
                         int(linhas[0]),
                         int(linhas[1]),
@@ -334,7 +329,7 @@ class Locacoes:
                 escritor.writerow(linha.get_linha())
 
     def add_locacao(self, nova_locacao: Locacao) -> None:
-        nova_locacao.set_id_carro(len(self.__lista))
+        nova_locacao.set_id_locacao(len(self.__lista))
         self.__lista.append(nova_locacao)
         self.salvar_csv()
 
